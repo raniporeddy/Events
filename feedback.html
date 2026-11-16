@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVENTS | Reviews & Feedback</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/chatbot.js"></script>
+  <style>
+    .star-rating-select {
+      display: flex;
+      gap: 0.4rem;
+      font-size: 1.6rem;
+      color: #D1D5DB;
+      cursor: pointer;
+    }
+    .star-rating-select i.active, .star-rating-select i:hover {
+      color: #F59E0B;
+    }
+    .review-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      margin-bottom: 1.2rem;
+      transition: var(--transition);
+    }
+    .review-card:hover {
+      box-shadow: var(--shadow-sm);
+      border-color: var(--secondary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div>
+          <div class="brand-title">EVENTS</div>
+          <span class="brand-tagline-micro">SCSVMV Deemed to be University</span>
+        </div>
+      </a>
+      
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul id="mainNavList">
+          <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="events.html"><i class="fas fa-calendar-days"></i> Events</a></li>
+          <li><a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a></li>
+          <li><a href="verify-certificate.html"><i class="fas fa-certificate"></i> Verify Certificate</a></li>
+          <span id="headerRoleLinkSlot"></span>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+        <div id="headerUserSlot"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── VISUAL PAGE HERO ─── -->
+  <section class="visual-page-hero" style="background-image:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1600&q=80')">
+    <div class="container">
+      <div style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.88rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#93C5FD;margin-bottom:1rem;text-shadow:0 2px 6px rgba(0,0,0,0.8)">
+        <i class="fas fa-star" style="color:#FBBF24"></i> Community Voices & Reviews
+      </div>
+      <h1 class="visual-page-hero-title">
+        Participant Experience & <span>Feedback</span>
+      </h1>
+      <p class="visual-page-hero-sub">
+        Read real ratings from verified attendees and submit your own feedback to help student clubs and faculty improve future campus experiences.
+      </p>
+    </div>
+  </section>
+
+  <div class="page-container" style="max-width:1150px;margin:2.5rem auto;padding:0 1.2rem">
+
+    <!-- Rating Summary Bar -->
+    <div class="kpi-grid" style="margin-bottom:2rem">
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap warning"><i class="fas fa-star"></i></div>
+        <div class="kpi-info">
+          <span class="kpi-label">Average University Rating</span>
+          <span class="kpi-value" id="kpiAvgRating">4.8 / 5.0</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap primary"><i class="fas fa-comments"></i></div>
+        <div class="kpi-info">
+          <span class="kpi-label">Total Verified Reviews</span>
+          <span class="kpi-value" id="kpiTotalReviews">0</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap success"><i class="fas fa-thumbs-up"></i></div>
+        <div class="kpi-info">
+          <span class="kpi-label">Satisfaction Rate</span>
+          <span class="kpi-value" id="kpiSatisfaction">96%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="grid-template-columns: 1.4fr 1fr;gap:2rem;align-items:flex-start">
+      <!-- Reviews Feed Left Column -->
+      <div>
+        <!-- Filter Bar -->
+        <div class="dash-card" style="margin-bottom:1.5rem;padding:1rem">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap">
+            <select class="form-input" id="filterEventReviews" style="flex:1;min-width:200px;font-size:0.86rem;padding:0.45rem 0.8rem">
+              <option value="all">All Events</option>
+            </select>
+            <div style="display:flex;gap:0.3rem">
+              <button class="chip active" onclick="setRatingFilter(0, this)">All Stars</button>
+              <button class="chip" onclick="setRatingFilter(5, this)">5 ★</button>
+              <button class="chip" onclick="setRatingFilter(4, this)">4 ★</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="reviewsFeed">
+          <div class="dash-card" style="text-align:center;padding:2.5rem"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</div>
+        </div>
+      </div>
+
+      <!-- Submit Feedback Right Column -->
+      <div>
+        <div class="dash-card" style="position:sticky;top:90px">
+          <div class="dash-card-header">
+            <div>
+              <h3 class="dash-card-title"><i class="fas fa-pen-alt text-secondary"></i> Submit Feedback</h3>
+              <p class="dash-card-subtitle">Share your perspective on attended events</p>
+            </div>
+          </div>
+
+          <form id="feedbackForm" onsubmit="handleSubmitFeedback(event)">
+            <div class="form-group" style="margin-bottom:1rem">
+              <label class="form-label"><i class="fas fa-calendar-check"></i> Select Event <span class="text-danger">*</span></label>
+              <select class="form-input" id="fbEventId" required></select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:1rem">
+              <label class="form-label"><i class="fas fa-star"></i> Your Overall Rating <span class="text-danger">*</span></label>
+              <div class="star-rating-select" id="starContainer">
+                <i class="fas fa-star active" data-val="1"></i>
+                <i class="fas fa-star active" data-val="2"></i>
+                <i class="fas fa-star active" data-val="3"></i>
+                <i class="fas fa-star active" data-val="4"></i>
+                <i class="fas fa-star active" data-val="5"></i>
+              </div>
+              <input type="hidden" id="selectedStarValue" value="5">
+            </div>
+
+            <div class="form-group" style="margin-bottom:1rem">
+              <label class="form-label"><i class="fas fa-comment-dots"></i> Feedback Comments <span class="text-danger">*</span></label>
+              <textarea class="form-input" id="fbComments" rows="3" required placeholder="What did you like about the sessions, speakers, venue, or practical exercises?"></textarea>
+            </div>
+
+            <div class="form-group" style="margin-bottom:1.5rem">
+              <label class="form-label"><i class="fas fa-camera"></i> Photo Upload (optional)</label>
+              <input type="file" class="form-input" id="fbPhotoFile" accept="image/*" onchange="previewPhoto(event)" style="font-size:0.85rem">
+              <div id="photoPreviewContainer" style="margin-top:0.6rem;display:none">
+                <img id="photoPreviewImg" src="" style="width:100%;max-height:160px;object-fit:cover;border-radius:var(--radius-sm)">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-paper-plane"></i> Submit Event Review</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <div class="footer-bottom">
+      <div class="footer-bottom-container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+        <div style="display:flex;align-items:center;gap:0.6rem;">
+          <img src="assets/images/logo.png" alt="SCSVMV Logo" style="height:30px;width:auto;">
+          <p style="margin:0">&copy; 2026 EVENTS &bull; Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV).</p>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);font-style:italic">Discover opportunities. Participate in experiences. Build your future.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    let currentFilterRating = 0;
+    let uploadedPhotoBase64 = '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadFeedbackData();
+      setupStarRating();
+      populateEventSelector();
+    });
+
+    function setupStarRating() {
+      const stars = document.querySelectorAll('#starContainer i');
+      stars.forEach(star => {
+        star.addEventListener('click', () => {
+          const val = parseInt(star.getAttribute('data-val'), 10);
+          document.getElementById('selectedStarValue').value = val;
+          stars.forEach(s => {
+            const sVal = parseInt(s.getAttribute('data-val'), 10);
+            if (sVal <= val) s.classList.add('active');
+            else s.classList.remove('active');
+          });
+        });
+      });
+    }
+
+    function populateEventSelector() {
+      const events = DB.getAll('events');
+      const select = document.getElementById('fbEventId');
+      const filterSelect = document.getElementById('filterEventReviews');
+
+      events.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.id;
+        opt.textContent = `${e.title} (${e.date})`;
+        select.appendChild(opt);
+
+        const filterOpt = document.createElement('option');
+        filterOpt.value = e.id;
+        filterOpt.textContent = e.title;
+        filterSelect.appendChild(filterOpt);
+      });
+
+      filterSelect.addEventListener('change', renderReviews);
+    }
+
+    function setRatingFilter(rating, btn) {
+      currentFilterRating = rating;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderReviews();
+    }
+
+    function loadFeedbackData() {
+      const allFb = DB.getAll('feedback');
+      document.getElementById('kpiTotalReviews').textContent = allFb.length;
+
+      if (allFb.length > 0) {
+        const avg = (allFb.reduce((acc, f) => acc + (f.rating || 5), 0) / allFb.length).toFixed(1);
+        document.getElementById('kpiAvgRating').textContent = `${avg} / 5.0`;
+      }
+
+      renderReviews();
+    }
+
+    function renderReviews() {
+      const feed = document.getElementById('reviewsFeed');
+      const allFb = DB.getAll('feedback');
+      const eventFilter = document.getElementById('filterEventReviews').value;
+
+      let filtered = allFb;
+      if (eventFilter !== 'all') {
+        filtered = filtered.filter(f => f.event_id === eventFilter);
+      }
+      if (currentFilterRating > 0) {
+        filtered = filtered.filter(f => f.rating === currentFilterRating);
+      }
+
+      if (!filtered.length) {
+        feed.innerHTML = `
+          <div class="dash-card" style="text-align:center;padding:2.5rem;color:var(--text-muted)">
+            <i class="fas fa-comment-slash" style="font-size:2rem;margin-bottom:0.6rem;display:block"></i>
+            No reviews matching this filter. Be the first to share your experience!
+          </div>
+        `;
+        return;
+      }
+
+      feed.innerHTML = filtered.map(f => {
+        const starsHtml = '★'.repeat(f.rating || 5) + '☆'.repeat(5 - (f.rating || 5));
+        const initial = (f.user_name || 'Student').charAt(0).toUpperCase();
+
+        return `
+          <div class="review-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.8rem">
+              <div style="display:flex;align-items:center;gap:0.75rem">
+                <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--secondary),var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700">
+                  ${initial}
+                </div>
+                <div>
+                  <div style="font-weight:700;color:var(--primary)">${f.user_name || 'Verified Student'}</div>
+                  <div style="font-size:0.75rem;color:var(--text-muted)">${f.department || 'Campus'} &bull; ${f.date || 'Recent'}</div>
+                </div>
+              </div>
+              <div style="color:#F59E0B;font-size:1.1rem;letter-spacing:1px">${starsHtml}</div>
+            </div>
+
+            <div style="font-size:0.82rem;font-weight:700;color:var(--secondary);margin-bottom:0.4rem">
+              Event: ${f.event_title || 'Campus Event'}
+            </div>
+
+            <p style="font-size:0.92rem;color:var(--text);line-height:1.6;margin-bottom:0.5rem">
+              "${f.comments || f.comment}"
+            </p>
+
+            ${f.photo_url ? `
+              <div style="margin-top:0.6rem">
+                <img src="${f.photo_url}" style="max-height:160px;border-radius:var(--radius-sm);object-fit:cover;border:1px solid var(--border)">
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function previewPhoto(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          uploadedPhotoBase64 = event.target.result;
+          document.getElementById('photoPreviewImg').src = uploadedPhotoBase64;
+          document.getElementById('photoPreviewContainer').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleSubmitFeedback(e) {
+      e.preventDefault();
+      const user = Auth.getCurrentUser();
+      const eventId = document.getElementById('fbEventId').value;
+      const ev = DB.getById('events', eventId);
+      const rating = parseInt(document.getElementById('selectedStarValue').value, 10) || 5;
+      const comments = document.getElementById('fbComments').value.trim();
+
+      const newFeedback = {
+        id: 'FB' + String(Date.now()).slice(-5),
+        event_id: eventId,
+        event_title: ev ? ev.title : 'Campus Event',
+        user_name: user ? user.name : 'Anonymous Student',
+        user_id: user ? user.id : 'anon',
+        department: user ? user.department : 'Engineering',
+        rating,
+        comments,
+        photo_url: uploadedPhotoBase64 || '',
+        date: new Date().toISOString().slice(0, 10)
+      };
+
+      DB.insert('feedback', newFeedback);
+      DB.logActivity('SUBMIT_FEEDBACK', `Submitted ${rating}-star review for "${ev ? ev.title : eventId}"`, user ? user.id : 'user');
+
+      Toast.show('Thank you! Your feedback has been published.', 'success');
+      document.getElementById('feedbackForm').reset();
+      document.getElementById('photoPreviewContainer').style.display = 'none';
+      uploadedPhotoBase64 = '';
+      loadFeedbackData();
+    }
+  </script>
+</body>
+</html>

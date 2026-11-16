@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVENTS | Discover. Participate. Connect.</title>
+  <meta name="description" content="EVENTS is a premier smart campus and industry event management platform connecting students, faculty, administrators, and enterprise partners.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous">
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/chatbot.js"></script>
+</head>
+<body>
+
+  <!-- ─── HEADER / NAVIGATION ─── -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div>
+          <div class="brand-title">EVENTS</div>
+          <span class="brand-tagline-micro">SCSVMV Deemed to be University</span>
+        </div>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul id="mainNavList">
+          <li><a href="index.html" class="active"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="events.html"><i class="fas fa-calendar-days"></i> Events</a></li>
+          <li><a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a></li>
+          <li><a href="verify-certificate.html"><i class="fas fa-certificate"></i> Verify Certificate</a></li>
+          <span id="headerRoleLinkSlot"></span>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Notification Bell Dropdown -->
+        <div class="notif-bell-wrap">
+          <button class="btn-theme-toggle" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
+            <i class="fas fa-bell"></i>
+            <span class="notif-badge-pill" id="notifBadgePill" style="display:none">0</span>
+          </button>
+          <div class="notif-dropdown-menu" id="notifDropdownMenu">
+            <div class="notif-dropdown-header">
+              <span>Notifications</span>
+              <a href="notifications.html" style="font-size:0.75rem">View All</a>
+            </div>
+            <div class="notif-dropdown-list" id="notifDropdownList"></div>
+          </div>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+
+        <!-- User Profile Slot -->
+        <div id="headerUserSlot"></div>
+
+        <!-- Mobile Menu Button -->
+        <button class="mobile-hamburger" onclick="document.querySelector('.desktop-nav').classList.toggle('open');" aria-label="Toggle navigation menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ─── 1. HERO SECTION ─── -->
+    <section class="hero-saas">
+      <div class="hero-content">
+        <div class="hero-pill-badge">
+          <i class="fas fa-bolt"></i> Next-Gen Campus & Industry Ecosystem
+        </div>
+        <h1 class="hero-title">
+          Connecting Campus with <span>Opportunities</span>.
+        </h1>
+        <p class="hero-desc">
+          Discover hands-on workshops, 48-hour hackathons, corporate placement drives, and verified digital credentials on one unified platform.
+        </p>
+
+        <!-- Search input inside hero -->
+        <div style="max-width:580px;margin:1.8rem auto 2rem">
+          <form onsubmit="handleHeroSearch(event)" style="display:flex;gap:0.5rem;background:rgba(255,255,255,0.12);backdrop-filter:blur(10px);padding:6px;border-radius:var(--radius-full);border:1px solid rgba(255,255,255,0.25)">
+            <input 
+              type="text" 
+              id="heroSearchInput" 
+              placeholder="Search by topic, hackathon, workshop, or tech stack..." 
+              style="flex:1;background:transparent;border:none;outline:none;padding:0.7rem 1.2rem;color:#ffffff;font-size:0.95rem"
+            >
+            <button type="submit" class="btn btn-primary btn-sm" style="border-radius:var(--radius-full);padding:0.7rem 1.5rem">
+              <i class="fas fa-search"></i> Search
+            </button>
+          </form>
+        </div>
+
+        <div class="hero-cta-group">
+          <a href="events.html" class="btn btn-primary btn-lg">
+            <i class="fas fa-compass"></i> Explore Events
+          </a>
+          <a href="create-event.html" class="btn btn-outline btn-lg" style="color:#ffffff;border-color:rgba(255,255,255,0.4);">
+            <i class="fas fa-calendar-plus"></i> Host an Event
+          </a>
+          <a href="company/dashboard.html" class="btn btn-secondary btn-lg" style="background:rgba(255,255,255,0.14);color:#ffffff;border:1px solid rgba(255,255,255,0.3);">
+            <i class="fas fa-building"></i> Industry Partners
+          </a>
+        </div>
+
+        <!-- Live KPI Metrics Counter (Clean, Open) -->
+        <div class="hero-metrics-bar">
+          <div class="hero-metric-item">
+            <div class="hero-metric-icon"><i class="fas fa-calendar-alt"></i></div>
+            <div class="hero-metric-num" id="heroStatEvents">12+</div>
+            <div class="hero-metric-label">Active Events</div>
+          </div>
+          <div class="hero-metric-item">
+            <div class="hero-metric-icon"><i class="fas fa-user-graduate"></i></div>
+            <div class="hero-metric-num" id="heroStatRegistrations">240+</div>
+            <div class="hero-metric-label">Student Registrations</div>
+          </div>
+          <div class="hero-metric-item">
+            <div class="hero-metric-icon"><i class="fas fa-handshake"></i></div>
+            <div class="hero-metric-num" id="heroStatCompanies">15+</div>
+            <div class="hero-metric-label">Corporate Partners</div>
+          </div>
+          <div class="hero-metric-item">
+            <div class="hero-metric-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="hero-metric-num" id="heroStatAttendance">94%</div>
+            <div class="hero-metric-label">Verified Attendance</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 2. FEATURED UPCOMING EVENTS ─── -->
+    <section class="container" style="padding-top:4.5rem;padding-bottom:3rem">
+      <div class="section-header">
+        <div>
+          <span style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:var(--secondary);letter-spacing:1px;display:block;margin-bottom:0.3rem;">Curated Experiences</span>
+          <h2 class="section-title">Featured Upcoming Events</h2>
+          <p class="section-subtitle">Flagship technical symposiums, hackathons, and recruitment drives happening this month</p>
+        </div>
+        <div style="display:flex;gap:0.6rem;">
+          <a href="events.html" class="btn btn-outline btn-sm"><i class="fas fa-filter"></i> Filter Events</a>
+          <a href="calendar.html" class="btn btn-secondary btn-sm"><i class="fas fa-calendar-alt"></i> Calendar View</a>
+        </div>
+      </div>
+
+      <div class="events-grid" id="homeFeaturedEventsGrid">
+        <div style="text-align:center;padding:3rem;grid-column:1/-1;color:var(--text-muted)"><i class="fas fa-spinner fa-spin"></i> Loading featured events...</div>
+      </div>
+    </section>
+
+    <!-- ─── 3. EXPLORE EVENT CATEGORIES (PROFESSIONAL SQUARE 1:1 CARDS) ─── -->
+    <section class="container" style="padding-top:2rem;padding-bottom:4.5rem">
+      <div class="section-header">
+        <div>
+          <span style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:var(--secondary);letter-spacing:1px;display:block;margin-bottom:0.3rem;">Specialized Disciplines</span>
+          <h2 class="section-title">Explore Event Categories</h2>
+          <p class="section-subtitle">Explore 12 dedicated event domains designed for university academics, innovation, and career acceleration</p>
+        </div>
+        <a href="events.html" class="btn btn-secondary btn-sm">Browse All <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <!-- Square 1:1 Image Grid -->
+      <div class="square-category-grid" id="homeSquareCategoriesGrid">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+    </section>
+
+    <!-- ─── CAMPUS EVENT MOMENTS & LIVE PHOTO GALLERY ─── -->
+    <section class="campus-gallery-section">
+      <div class="container" style="padding:0">
+        <div class="section-header">
+          <div>
+            <span style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:var(--secondary);letter-spacing:1px;display:block;margin-bottom:0.3rem;">Campus Visual Chronicles</span>
+            <h2 class="section-title">Life & Moments on Campus</h2>
+            <p class="section-subtitle">Real moments captured across university symposiums, hackathons, cultural festivals, and career milestones</p>
+          </div>
+          <a href="events.html" class="btn btn-secondary btn-sm"><i class="fas fa-images"></i> Explore All Events</a>
+        </div>
+
+        <div class="campus-gallery-grid">
+          <!-- Item 1: Hackathon (span-2) -->
+          <div class="campus-gallery-item span-2" onclick="location.href='events.html?cat=Hackathons'">
+            <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1000&q=80" alt="Campus Hackathon" class="campus-gallery-img" loading="lazy">
+            <div class="campus-gallery-overlay">
+              <span class="campus-gallery-badge"><i class="fas fa-code-branch"></i> 48-Hour Hackathon</span>
+              <div class="campus-gallery-info">
+                <h3 class="campus-gallery-title">Global AI & Cloud Hackathon</h3>
+                <p class="campus-gallery-desc">Over 300 engineering innovators building autonomous systems and generative AI prototypes.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 2: Cultural Fest -->
+          <div class="campus-gallery-item" onclick="location.href='events.html?cat=Cultural+Events'">
+            <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80" alt="Cultural Celebrations" class="campus-gallery-img" loading="lazy">
+            <div class="campus-gallery-overlay">
+              <span class="campus-gallery-badge"><i class="fas fa-masks-theater"></i> Cultural Fest</span>
+              <div class="campus-gallery-info">
+                <h3 class="campus-gallery-title">Rhythm & Arts Festival</h3>
+                <p class="campus-gallery-desc">Annual cultural extravaganza celebrating music, classical arts, and theater.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 3: Technical Seminar -->
+          <div class="campus-gallery-item" onclick="location.href='events.html?cat=Conferences'">
+            <img src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&q=80" alt="Research Conference" class="campus-gallery-img" loading="lazy">
+            <div class="campus-gallery-overlay">
+              <span class="campus-gallery-badge"><i class="fas fa-microphone-alt"></i> Tech Keynote</span>
+              <div class="campus-gallery-info">
+                <h3 class="campus-gallery-title">International Cloud Summit</h3>
+                <p class="campus-gallery-desc">Distinguished researchers and Silicon Valley engineers addressing university scholars.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 4: Hands-on Robotics Workshop -->
+          <div class="campus-gallery-item" onclick="location.href='events.html?cat=Workshops'">
+            <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80" alt="Robotics & IoT Workshop" class="campus-gallery-img" loading="lazy">
+            <div class="campus-gallery-overlay">
+              <span class="campus-gallery-badge"><i class="fas fa-robot"></i> Practical Lab</span>
+              <div class="campus-gallery-info">
+                <h3 class="campus-gallery-title">Advanced Robotics & Embedded Systems</h3>
+                <p class="campus-gallery-desc">Hands-on firmware prototyping, sensor arrays, and microcontroller control.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 5: Corporate Placement Drive (span-2) -->
+          <div class="campus-gallery-item span-2" onclick="location.href='events.html?cat=Placement+Activities'">
+            <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1000&q=80" alt="Placement Drive" class="campus-gallery-img" loading="lazy">
+            <div class="campus-gallery-overlay">
+              <span class="campus-gallery-badge"><i class="fas fa-briefcase"></i> Campus Recruitment</span>
+              <div class="campus-gallery-info">
+                <h3 class="campus-gallery-title">Tier-1 Corporate Placement Drive</h3>
+                <p class="campus-gallery-desc">Over 45 enterprise hiring partners conducting technical interviews and talent onboarding.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 6: Convocation & Achievements -->
+          <div class="campus-gallery-item" onclick="location.href='verify-certificate.html'">
+            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80" alt="Certificates & Convocation" class="campus-gallery-img" loading="lazy">
+            <div class="campus-gallery-overlay">
+              <span class="campus-gallery-badge"><i class="fas fa-award"></i> Honors & Awards</span>
+              <div class="campus-gallery-info">
+                <h3 class="campus-gallery-title">Digital Certification Honors</h3>
+                <p class="campus-gallery-desc">Verified digital certificates issued automatically to all qualifying attendees.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 4. POPULAR EVENTS ─── -->
+    <section style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4.5rem 1.5rem">
+      <div class="container" style="padding:0">
+        <div class="section-header">
+          <div>
+            <span style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:#F59E0B;letter-spacing:1px;display:block;margin-bottom:0.3rem;">Trending on Campus</span>
+            <h2 class="section-title">Most Popular Events</h2>
+            <p class="section-subtitle">High-demand programs with the highest student enrollment and fast-filling seats</p>
+          </div>
+          <a href="events.html?sort=popular" class="btn btn-outline btn-sm">View Trending <i class="fas fa-fire" style="color:#F59E0B"></i></a>
+        </div>
+
+        <div class="events-grid" id="homePopularEventsGrid">
+          <div style="text-align:center;padding:3rem;grid-column:1/-1;color:var(--text-muted)"><i class="fas fa-spinner fa-spin"></i> Loading popular events...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 5. INDUSTRY AND COMPANY EVENTS ─── -->
+    <section class="container" style="padding:4.5rem 1.5rem">
+      <div class="section-header">
+        <div>
+          <span style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:#10B981;letter-spacing:1px;display:block;margin-bottom:0.3rem;">Corporate Collaboration</span>
+          <h2 class="section-title">Industry & Placement Activities</h2>
+          <p class="section-subtitle">Placement recruitment drives, technical interview masterclasses, and corporate internship sessions</p>
+        </div>
+        <a href="events.html?cat=Placement+Activities" class="btn btn-secondary btn-sm"><i class="fas fa-briefcase"></i> Explore Placement Drives</a>
+      </div>
+
+      <div class="events-grid" id="homeIndustryEventsGrid">
+        <div style="text-align:center;padding:3rem;grid-column:1/-1;color:var(--text-muted)"><i class="fas fa-spinner fa-spin"></i> Loading corporate sessions...</div>
+      </div>
+    </section>
+
+    <!-- ─── 6. UPCOMING WORKSHOPS & HACKATHONS ─── -->
+    <section style="background:var(--surface-alt);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4.5rem 1.5rem">
+      <div class="container" style="padding:0">
+        <div class="section-header">
+          <div>
+            <span style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:var(--accent);letter-spacing:1px;display:block;margin-bottom:0.3rem;">Practical Learning</span>
+            <h2 class="section-title">Workshops & Hackathons</h2>
+            <p class="section-subtitle">Immersive hands-on software development bootcamps and competitive hackathons</p>
+          </div>
+          <a href="events.html?cat=Workshops" class="btn btn-outline btn-sm"><i class="fas fa-laptop-code"></i> View All Workshops</a>
+        </div>
+
+        <div class="events-grid" id="homeWorkshopsGrid">
+          <div style="text-align:center;padding:3rem;grid-column:1/-1;color:var(--text-muted)"><i class="fas fa-spinner fa-spin"></i> Loading workshops...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 7. WHY CHOOSE EVENTS? (VISUAL FEATURE STORY SHOWCASE) ─── -->
+    <section class="container" style="padding:5rem 1.5rem">
+      <div class="section-header" style="text-align:center;justify-content:center;margin-bottom:3.5rem">
+        <div>
+          <span style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:var(--secondary);letter-spacing:1px;display:block;margin-bottom:0.4rem">Platform Value</span>
+          <h2 class="section-title">Why Choose EVENTS?</h2>
+          <p class="section-subtitle" style="max-width:650px;margin:0 auto">A modern, unified digital ecosystem engineered for campus students, faculty coordinators, and corporate recruiters.</p>
+        </div>
+      </div>
+
+      <div class="visual-feature-grid">
+        <!-- Feature 1: Instant QR Passes -->
+        <div class="visual-feature-card">
+          <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80" alt="Instant QR Passes" class="visual-feature-bg" loading="lazy">
+          <div class="visual-feature-overlay"></div>
+          <div class="visual-feature-content">
+            <div class="visual-feature-icon-pill"><i class="fas fa-qrcode"></i></div>
+            <h3 class="visual-feature-title">Instant QR Passes</h3>
+            <p class="visual-feature-desc">Every confirmed registration delivers a cryptographic QR code pass ready for instant mobile entrance scanning.</p>
+            <span style="font-size:0.8rem;color:#60A5FA;font-weight:700;"><i class="fas fa-shield-alt"></i> Contactless Gate Check-In</span>
+          </div>
+        </div>
+
+        <!-- Feature 2: Verified Certificates -->
+        <div class="visual-feature-card">
+          <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&q=80" alt="Verified Certificates" class="visual-feature-bg" loading="lazy">
+          <div class="visual-feature-overlay"></div>
+          <div class="visual-feature-content">
+            <div class="visual-feature-icon-pill" style="color:#C084FC;"><i class="fas fa-award"></i></div>
+            <h3 class="visual-feature-title">Verified Certificates</h3>
+            <p class="visual-feature-desc">Participation certificates unlock automatically upon gate check-in, stamped with a public tamper-proof credential ID.</p>
+            <span style="font-size:0.8rem;color:#C084FC;font-weight:700;"><i class="fas fa-check-circle"></i> Instant University Verification</span>
+          </div>
+        </div>
+
+        <!-- Feature 3: Conflict Detection -->
+        <div class="visual-feature-card">
+          <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80" alt="Smart Conflict Detection" class="visual-feature-bg" loading="lazy">
+          <div class="visual-feature-overlay"></div>
+          <div class="visual-feature-content">
+            <div class="visual-feature-icon-pill" style="color:#34D399;"><i class="fas fa-calendar-check"></i></div>
+            <h3 class="visual-feature-title">Conflict Detection</h3>
+            <p class="visual-feature-desc">Smart schedule overlap alarms alert you before you double-book an auditorium, lab session, or conflicting workshop.</p>
+            <span style="font-size:0.8rem;color:#34D399;font-weight:700;"><i class="fas fa-bell"></i> Real-Time Schedule Alarms</span>
+          </div>
+        </div>
+
+        <!-- Feature 4: Corporate Placement -->
+        <div class="visual-feature-card">
+          <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80" alt="Corporate Placement" class="visual-feature-bg" loading="lazy">
+          <div class="visual-feature-overlay"></div>
+          <div class="visual-feature-content">
+            <div class="visual-feature-icon-pill" style="color:#FBBF24;"><i class="fas fa-building"></i></div>
+            <h3 class="visual-feature-title">Corporate Placement</h3>
+            <p class="visual-feature-desc">Direct partnership with leading enterprises for official on-campus hiring drives, tech assessments, and internships.</p>
+            <span style="font-size:0.8rem;color:#FBBF24;font-weight:700;"><i class="fas fa-handshake"></i> Direct Industry Onboarding</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 8. PLATFORM EVENT STATISTICS (PANORAMIC IMAGE BANNER) ─── -->
+    <section class="visual-telemetry-banner" style="background-image:url('https://images.unsplash.com/photo-1511578314322-379afb476865?w=1600&q=80')">
+      <div class="container">
+        <div style="text-align:center;margin-bottom:1.5rem">
+          <span style="font-size:0.82rem;font-weight:700;text-transform:uppercase;color:#60A5FA;letter-spacing:1.5px;display:inline-block;margin-bottom:0.4rem">Real-Time Telemetry</span>
+          <h2 style="font-size:2.5rem;font-weight:900;color:#ffffff;margin-bottom:0.5rem">Empowering Campus Excellence</h2>
+          <p style="color:#CBD5E1;font-size:1.05rem;max-width:680px;margin:0 auto">Live metrics and milestones across academic departments, student registrations, and verified certifications.</p>
+        </div>
+
+        <div class="visual-telemetry-grid">
+          <div class="visual-telemetry-box">
+            <div class="hero-metric-icon" style="font-size:1.9rem;color:#60A5FA;margin-bottom:0.5rem"><i class="fas fa-calendar-alt"></i></div>
+            <div style="font-size:3rem;font-weight:900;color:#60A5FA;line-height:1" id="statTelEvents">0</div>
+            <div style="font-size:0.95rem;color:#E2E8F0;font-weight:600;margin-top:0.4rem">Total Events Hosted</div>
+          </div>
+          <div class="visual-telemetry-box">
+            <div class="hero-metric-icon" style="font-size:1.9rem;color:#34D399;margin-bottom:0.5rem"><i class="fas fa-users"></i></div>
+            <div style="font-size:3rem;font-weight:900;color:#34D399;line-height:1" id="statTelRegs">0</div>
+            <div style="font-size:0.95rem;color:#E2E8F0;font-weight:600;margin-top:0.4rem">Confirmed Registrations</div>
+          </div>
+          <div class="visual-telemetry-box">
+            <div class="hero-metric-icon" style="font-size:1.9rem;color:#FBBF24;margin-bottom:0.5rem"><i class="fas fa-chart-line"></i></div>
+            <div style="font-size:3rem;font-weight:900;color:#FBBF24;line-height:1" id="statTelRate">0%</div>
+            <div style="font-size:0.95rem;color:#E2E8F0;font-weight:600;margin-top:0.4rem">Average Attendance Rate</div>
+          </div>
+          <div class="visual-telemetry-box">
+            <div class="hero-metric-icon" style="font-size:1.9rem;color:#A78BFA;margin-bottom:0.5rem"><i class="fas fa-award"></i></div>
+            <div style="font-size:3rem;font-weight:900;color:#A78BFA;line-height:1" id="statTelCerts">0</div>
+            <div style="font-size:0.95rem;color:#E2E8F0;font-weight:600;margin-top:0.4rem">Certificates Generated</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 9. FREQUENTLY ASKED QUESTIONS (SPLIT VISUAL LAYOUT) ─── -->
+    <section class="container" style="padding:5rem 1.5rem">
+      <div class="section-header" style="text-align:center;justify-content:center;margin-bottom:3.5rem">
+        <div>
+          <span style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:var(--secondary);letter-spacing:1px;display:block;margin-bottom:0.4rem">Got Questions?</span>
+          <h2 class="section-title">Frequently Asked Questions</h2>
+          <p class="section-subtitle" style="max-width:620px;margin:0 auto">Find quick answers about registrations, QR passes, and certificates</p>
+        </div>
+      </div>
+
+      <div class="visual-faq-split">
+        <!-- Left: Image Banner -->
+        <div class="visual-faq-banner">
+          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80" alt="Student Community Support" class="visual-faq-banner-img" loading="lazy">
+          <div class="visual-faq-banner-overlay"></div>
+          <div class="visual-faq-banner-content">
+            <span class="campus-gallery-badge" style="margin-bottom:1rem"><i class="fas fa-headset"></i> Dedicated Help Desk</span>
+            <h3 style="font-size:1.5rem;font-weight:900;color:#ffffff;line-height:1.3;margin-bottom:0.6rem">Here to Help You Connect & Excel</h3>
+            <p style="font-size:0.9rem;color:#CBD5E1;line-height:1.55;margin-bottom:1.4rem">Have questions regarding gate check-in, corporate placement eligibility, or certificate verification? Our university coordinator desk is always available.</p>
+            <div style="display:flex;gap:0.8rem;flex-wrap:wrap">
+              <a href="verify-certificate.html" class="btn btn-primary btn-sm"><i class="fas fa-certificate"></i> Verify Certificate</a>
+              <a href="feedback.html" class="btn btn-outline btn-sm" style="color:#ffffff;border-color:rgba(255,255,255,0.4)"><i class="fas fa-comment-alt"></i> Ask Support</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Modern Accordion List (Borderless) -->
+        <div style="display:flex;flex-direction:column;gap:0.5rem">
+          <details class="faq-clean-item" open>
+            <summary>
+              <span><i class="fas fa-question-circle text-secondary" style="margin-right:10px"></i> How do I register for an event?</span>
+            </summary>
+            <p>
+              Simply navigate to the <a href="events.html" style="color:var(--secondary);font-weight:600">Events catalog</a>, choose any event, and click "Register for Event". If you are signed in, your student details are auto-filled, and a QR ticket pass is generated immediately.
+            </p>
+          </details>
+
+          <details class="faq-clean-item">
+            <summary>
+              <span><i class="fas fa-award text-secondary" style="margin-right:10px"></i> How do digital participation certificates work?</span>
+            </summary>
+            <p>
+              When you attend an event and the organizer scans your digital QR pass at the entrance desk, attendance is recorded automatically. Your official certificate is instantly unlocked under your profile and verifiable on our public verification portal.
+            </p>
+          </details>
+
+          <details class="faq-clean-item">
+            <summary>
+              <span><i class="fas fa-chalkboard-teacher text-secondary" style="margin-right:10px"></i> Can faculty members and student clubs propose events?</span>
+            </summary>
+            <p>
+              Yes! Faculty members and recognized student clubs can submit event proposals with custom schedules, capacity limits, and venue preferences through the <a href="create-event.html" style="color:var(--secondary);font-weight:600">Event Proposal page</a> or faculty portal.
+            </p>
+          </details>
+
+          <details class="faq-clean-item">
+            <summary>
+              <span><i class="fas fa-building text-secondary" style="margin-right:10px"></i> How can companies post campus recruitment drives?</span>
+            </summary>
+            <p>
+              Corporate recruiters can register under the Company role and access the dedicated <a href="company/dashboard.html" style="color:var(--secondary);font-weight:600">Industry Partner Portal</a> to post placement drives, track applicant resumes, and export attendee rosters.
+            </p>
+          </details>
+        </div>
+      </div>
+
+      <!-- Call to Action Banner -->
+      <div class="visual-cta-banner" style="background-image:url('https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=1600&q=80')">
+        <div class="visual-cta-content">
+          <span class="campus-gallery-badge" style="margin-bottom:1rem"><i class="fas fa-rocket"></i> Empowering Campus Leaders</span>
+          <h2 style="font-size:2.2rem;font-weight:900;margin-bottom:0.8rem;color:#ffffff">Ready to Host Your Next Big Campus Event?</h2>
+          <p style="font-size:1.05rem;color:#CBD5E1;line-height:1.6;margin-bottom:1.8rem">Join hundreds of student clubs, academic departments, and industry partners who orchestrate world-class symposiums, hackathons, and placement drives on EVENTS.</p>
+          <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap">
+            <a href="create-event.html" class="btn btn-primary btn-lg"><i class="fas fa-calendar-plus"></i> Submit Event Proposal</a>
+            <a href="company/dashboard.html" class="btn btn-outline btn-lg" style="color:#ffffff;border-color:rgba(255,255,255,0.4)"><i class="fas fa-building"></i> Partner With SCSVMV</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ─── 10. PROFESSIONAL FOOTER ─── -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.8rem">
+            <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-footer-logo">
+            <div>
+              <div class="brand-title" style="color:#ffffff">EVENTS</div>
+              <span class="brand-tagline-micro" style="color:#94A3B8">SCSVMV Deemed to be University</span>
+            </div>
+          </div>
+          <p class="footer-desc">
+            Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV) &bull; Smart Campus & Industry Event Management Platform connecting students, faculty, and corporate partners through curated opportunities.
+          </p>
+          <div style="display:flex;gap:0.75rem;margin-top:1.2rem;font-size:1.1rem">
+            <a href="#" style="color:#94A3B8"><i class="fab fa-linkedin"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-twitter"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-github"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fas fa-layer-group text-secondary"></i> Platform</h4>
+          <ul>
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="events.html"><i class="fas fa-calendar-alt"></i> Browse Events</a></li>
+            <li><a href="calendar.html"><i class="fas fa-calendar-day"></i> Event Calendar</a></li>
+            <li><a href="verify-certificate.html"><i class="fas fa-award"></i> Certificate Verification</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fas fa-user-shield text-secondary"></i> Portals</h4>
+          <ul>
+            <li><a href="profile.html"><i class="fas fa-user-graduate"></i> Student Profile</a></li>
+            <li><a href="faculty/dashboard.html"><i class="fas fa-chalkboard-teacher"></i> Faculty Console</a></li>
+            <li><a href="company/dashboard.html"><i class="fas fa-building"></i> Corporate Hub</a></li>
+            <li><a href="admin/dashboard.html"><i class="fas fa-shield-alt"></i> Administrator Command</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fas fa-headset text-secondary"></i> Contact & Support</h4>
+          <ul>
+            <li><i class="fas fa-envelope" style="margin-right:6px"></i> support@eventsplatform.edu</li>
+            <li><i class="fas fa-phone" style="margin-right:6px"></i> +91 (044) 2726-4300</li>
+            <li><i class="fas fa-map-marker-alt" style="margin-right:6px"></i> University Innovation Enclave</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 EVENTS &bull; Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV). All rights reserved.
+        </div>
+        <div style="font-style:italic;color:#94A3B8">
+          "Discover opportunities. Participate in experiences. Build your future."
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── HOMEPAGE SCRIPT LOGIC ─── -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Telemetry Counters
+      if (window.DB) {
+        const stats = window.DB.getAnalytics();
+        const allEvents = window.DB.getAll('events');
+        const allRegs = window.DB.getAll('registrations');
+        const allCerts = window.DB.getAll('certificates') || [];
+
+        // Hero counters
+        document.getElementById('heroStatEvents').textContent = allEvents.length || '12+';
+        document.getElementById('heroStatRegistrations').textContent = allRegs.length || '240+';
+        document.getElementById('heroStatCompanies').textContent = stats.companiesCount || '15+';
+        document.getElementById('heroStatAttendance').textContent = `${stats.attendanceRate}%`;
+
+        // Telemetry section counters
+        document.getElementById('statTelEvents').textContent = allEvents.length;
+        document.getElementById('statTelRegs').textContent = allRegs.length;
+        document.getElementById('statTelRate').textContent = `${stats.attendanceRate}%`;
+        document.getElementById('statTelCerts').textContent = allCerts.length || stats.attendedCount;
+
+        // 2. Render 12 Square Category Cards (1:1 Ratio)
+        renderSquareCategories(allEvents);
+
+        // 3. Render Featured Events
+        renderFeaturedEvents(allEvents);
+
+        // 4. Render Popular Events
+        renderPopularEvents(allEvents);
+
+        // 5. Render Industry Events
+        renderIndustryEvents(allEvents);
+
+        // 6. Render Workshops & Hackathons
+        renderWorkshopsEvents(allEvents);
+      }
+    });
+
+    function handleHeroSearch(e) {
+      e.preventDefault();
+      const val = document.getElementById('heroSearchInput').value.trim();
+      if (val) {
+        window.location.href = `events.html?search=${encodeURIComponent(val)}`;
+      }
+    }
+
+    function renderSquareCategories(events) {
+      const container = document.getElementById('homeSquareCategoriesGrid');
+      if (!container || !window.CampusConfig) return;
+
+      const categories = window.CampusConfig.get('categories') || [];
+
+      container.innerHTML = categories.map(cat => {
+        // Count available events matching this category
+        const count = events.filter(e => 
+          (e.category && e.category.toLowerCase().includes(cat.name.toLowerCase())) ||
+          (cat.name.toLowerCase().includes(e.category ? e.category.toLowerCase() : ''))
+        ).length;
+
+        return `
+          <a href="events.html?cat=${encodeURIComponent(cat.name)}" class="square-category-card" title="Explore ${cat.name}">
+            <img src="${cat.image}" alt="${cat.name}" class="square-category-img" loading="lazy">
+            <div class="square-category-overlay">
+              <div class="square-category-top">
+                <span class="square-category-badge"><i class="fas ${cat.icon}"></i> ${cat.name.split(' ')[0]}</span>
+                <span class="square-category-count">${count} Event${count === 1 ? '' : 's'}</span>
+              </div>
+              <div class="square-category-bottom">
+                <h3 class="square-category-title">${cat.name}</h3>
+                <p class="square-category-desc">${cat.description}</p>
+                <span class="square-category-action">Explore Category <i class="fas fa-arrow-right"></i></span>
+              </div>
+            </div>
+          </a>
+        `;
+      }).join('');
+    }
+
+    function createEventCardHtml(ev) {
+      const regCount = ev.registered_count || 0;
+      const maxCap = ev.max_participants || 100;
+      const percent = Math.min(100, Math.round((regCount / maxCap) * 100));
+      const avail = Math.max(0, maxCap - regCount);
+      const isFav = window.DB ? window.DB.isFavorite(ev.id) : false;
+
+      let statusBadge = '<span class="event-status-pill status-upcoming">Upcoming</span>';
+      if (ev.status === 'completed') {
+        statusBadge = '<span class="event-status-pill status-completed">Completed</span>';
+      } else if (avail === 0) {
+        statusBadge = '<span class="event-status-pill status-waitlist">Waitlist</span>';
+      }
+
+      return `
+        <div class="event-card">
+          <div class="event-card-media" style="background-image:url('${ev.image_url || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80'}');">
+            <div class="event-badge-tag"><i class="fas fa-tag"></i> ${ev.category}</div>
+            ${statusBadge}
+            <button class="btn-wishlist event-bookmark-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${ev.id}', this, event)" title="Save to wishlist">
+              <i class="fas fa-bookmark"></i>
+            </button>
+          </div>
+
+          <div class="event-card-content">
+            <div class="event-card-category">${ev.department || 'All Campus'}</div>
+            <h3 class="event-card-title">${ev.title}</h3>
+
+            <div class="event-card-meta">
+              <div class="event-meta-row">
+                <i class="fas fa-calendar-day"></i>
+                <span>${ev.date}</span>
+              </div>
+              <div class="event-meta-row">
+                <i class="fas fa-clock"></i>
+                <span>${ev.time || '10:00 AM'}</span>
+              </div>
+              <div class="event-meta-row">
+                <i class="fas fa-map-marker-alt"></i>
+                <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ev.venue}</span>
+              </div>
+              <div class="event-meta-row">
+                <i class="fas fa-user-tie"></i>
+                <span>By ${ev.organizer_name}</span>
+              </div>
+            </div>
+
+            <!-- Seat Availability Progress Meter -->
+            <div class="event-capacity-box">
+              <div class="capacity-meter-bar">
+                <div class="capacity-meter-fill" style="width:${percent}%"></div>
+              </div>
+              <div class="capacity-meter-label">
+                <span><i class="fas fa-users text-secondary"></i> <strong>${regCount}</strong> / ${maxCap} (${percent}%)</span>
+                <span style="color:${avail > 0 ? '#10B981' : '#EF4444'};font-weight:700">${avail > 0 ? avail + ' seats left' : 'Full'}</span>
+              </div>
+            </div>
+
+            <div class="event-card-footer">
+              <span style="font-size:0.8rem;color:var(--text-muted)">
+                <i class="fas fa-ticket-alt text-secondary"></i> Free Access
+              </span>
+              <a href="event-details.html?id=${ev.id}" class="btn btn-primary btn-sm">
+                View Details <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFeaturedEvents(events) {
+      const container = document.getElementById('homeFeaturedEventsGrid');
+      if (!container) return;
+      const featured = events.slice(0, 3);
+      container.innerHTML = featured.map(createEventCardHtml).join('');
+    }
+
+    function renderPopularEvents(events) {
+      const container = document.getElementById('homePopularEventsGrid');
+      if (!container) return;
+      const popular = [...events].sort((a, b) => (b.registered_count || 0) - (a.registered_count || 0)).slice(0, 3);
+      container.innerHTML = popular.map(createEventCardHtml).join('');
+    }
+
+    function renderIndustryEvents(events) {
+      const container = document.getElementById('homeIndustryEventsGrid');
+      if (!container) return;
+      const industry = events.filter(e => 
+        e.category.includes('Placement') || 
+        e.category.includes('Industry') || 
+        e.category.includes('Internship') ||
+        e.organizer_type === 'company'
+      ).slice(0, 3);
+
+      if (!industry.length) {
+        container.innerHTML = events.slice(2, 5).map(createEventCardHtml).join('');
+      } else {
+        container.innerHTML = industry.map(createEventCardHtml).join('');
+      }
+    }
+
+    function renderWorkshopsEvents(events) {
+      const container = document.getElementById('homeWorkshopsGrid');
+      if (!container) return;
+      const workshops = events.filter(e => 
+        e.category.includes('Workshop') || 
+        e.category.includes('Hackathon') ||
+        e.category.includes('Symposium')
+      ).slice(0, 3);
+
+      container.innerHTML = (workshops.length ? workshops : events.slice(0, 3)).map(createEventCardHtml).join('');
+    }
+
+    function toggleFav(id, btn, e) {
+      e.stopPropagation();
+      if (window.DB) {
+        const added = window.DB.toggleFavorite(id);
+        btn.classList.toggle('active', added);
+        if (window.showToast) {
+          window.showToast(added ? 'Saved to your favorites!' : 'Removed from favorites', 'info');
+        }
+      }
+    }
+  </script>
+</body>
+</html>

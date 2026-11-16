@@ -1,0 +1,36 @@
+[
+  {
+    "id": "USR_COMP_01",
+    "name": "TechCorp Solutions Inc.",
+    "industry": "Software & Cloud Services",
+    "email": "connect@techcorp.io",
+    "website": "https://techcorp.io",
+    "contact_person": "Rohan Mehra",
+    "verified": true,
+    "logo_url": "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&q=80",
+    "description": "Global enterprise software leader specializing in high-throughput cloud infrastructure and automated AI developer tools.",
+    "created_at": "2026-04-10T10:00:00Z"
+  },
+  {
+    "id": "USR_COMP_02",
+    "name": "CyberShield Defense Labs",
+    "industry": "Information Security",
+    "email": "edu@cybershield.com",
+    "website": "https://cybershield.com",
+    "contact_person": "Elena Vance",
+    "verified": true,
+    "logo_url": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200&q=80",
+    "description": "Next-generation cybersecurity consultancy providing threat intelligence and hands-on workforce skill transformation.",
+    "created_at": "2026-03-20T10:00:00Z"
+  },
+  {
+    "id": "USR_179485051448938",
+    "name": "NexusTech Systems Inc.",
+    "industry": "Cloud Infrastructure",
+    "email": "contact_1794850514424@nexustech.io",
+    "website": "https://nexustech.io",
+    "contact_person": "NexusTech Systems",
+    "verified": true,
+    "created_at": "2026-11-16T17:35:14.491Z"
+  }
+]

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVENTS | Propose Campus Event</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/chatbot.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div>
+          <div class="brand-title">EVENTS</div>
+          <span class="brand-tagline-micro">SCSVMV Deemed to be University</span>
+        </div>
+      </a>
+      
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul id="mainNavList">
+          <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="events.html"><i class="fas fa-calendar-days"></i> Events</a></li>
+          <li><a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a></li>
+          <li><a href="verify-certificate.html"><i class="fas fa-certificate"></i> Verify Certificate</a></li>
+          <span id="headerRoleLinkSlot"></span>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+        <div id="headerUserSlot"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── VISUAL PAGE HERO ─── -->
+  <section class="visual-page-hero" style="background-image:url('https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=1600&q=80')">
+    <div class="container">
+      <div style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.88rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#93C5FD;margin-bottom:1rem;text-shadow:0 2px 6px rgba(0,0,0,0.8)">
+        <i class="fas fa-calendar-plus" style="color:#FBBF24"></i> Campus Event Initiation
+      </div>
+      <h1 class="visual-page-hero-title">
+        Propose a Campus <span>Event</span>
+      </h1>
+      <p class="visual-page-hero-sub">
+        Faculty coordinators, student clubs, and department heads can submit workshops, symposiums, and cultural festivals for university administrative approval.
+      </p>
+    </div>
+  </section>
+
+  <div class="page-container" style="max-width:900px;margin:2.5rem auto;padding:0 1.2rem">
+    <div class="dash-card">
+      <div class="alert alert-info" style="margin-bottom:1.8rem;background:rgba(65,105,225,0.08);border-left:4px solid var(--secondary);padding:0.9rem 1.2rem;border-radius:var(--radius-sm)">
+        <i class="fas fa-info-circle text-secondary"></i>
+        <strong>University Review Process:</strong> Once submitted, your event will enter the administrative queue for venue allotment, faculty endorsement, and calendar publication.
+      </div>
+
+      <form id="createEventForm" onsubmit="handleCreateEvent(event)">
+        <!-- Section 1: Overview -->
+        <div style="margin-bottom:2rem">
+          <h3 style="font-size:1.1rem;color:var(--primary);margin-bottom:1.2rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border)">
+            <i class="fas fa-file-alt text-secondary"></i> 1. Event Information
+          </h3>
+
+          <div class="form-group" style="margin-bottom:1rem">
+            <label class="form-label"><i class="fas fa-heading"></i> Event Title <span class="text-danger">*</span></label>
+            <input type="text" class="form-input" id="evTitle" required placeholder="e.g. National Hackathon on Generative AI & Robotics">
+          </div>
+
+          <div class="grid-2" style="margin-bottom:1rem">
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-tags"></i> Event Category <span class="text-danger">*</span></label>
+              <select class="form-input" id="evCategory" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-graduation-cap"></i> Host Academic Department <span class="text-danger">*</span></label>
+              <select class="form-input" id="evDepartment" required></select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:1rem">
+            <label class="form-label"><i class="fas fa-align-left"></i> Detailed Event Description <span class="text-danger">*</span></label>
+            <textarea class="form-input" id="evDescription" rows="4" required placeholder="Describe objectives, schedule outline, keynote speakers, prerequisites, and learning takeaways..."></textarea>
+          </div>
+        </div>
+
+        <!-- Section 2: Date, Time & Conflict Check -->
+        <div style="margin-bottom:2rem">
+          <h3 style="font-size:1.1rem;color:var(--primary);margin-bottom:1.2rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border)">
+            <i class="fas fa-clock text-secondary"></i> 2. Schedule & Venue Logistics
+          </h3>
+
+          <div class="grid-2" style="margin-bottom:1rem">
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-calendar-day"></i> Event Date <span class="text-danger">*</span></label>
+              <input type="date" class="form-input" id="evDate" required onchange="checkVenueConflict()">
+            </div>
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-calendar-alt"></i> End Date (optional for multi-day)</label>
+              <input type="date" class="form-input" id="evEndDate">
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-bottom:1rem">
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-clock"></i> Start Time <span class="text-danger">*</span></label>
+              <input type="time" class="form-input" id="evTime" value="09:30" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-stopwatch"></i> End Time</label>
+              <input type="time" class="form-input" id="evEndTime" value="16:30">
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-bottom:1rem">
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-map-marker-alt"></i> Venue / Auditorium / Lab <span class="text-danger">*</span></label>
+              <input type="text" class="form-input" id="evVenue" required placeholder="e.g. Main Auditorium & Tech Hall" onchange="checkVenueConflict()">
+            </div>
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-users"></i> Maximum Attendee Capacity <span class="text-danger">*</span></label>
+              <input type="number" class="form-input" id="evMaxCapacity" value="120" min="5" max="3000" required>
+            </div>
+          </div>
+
+          <!-- Conflict Warning Banner (if detected) -->
+          <div id="conflictAlert" style="display:none;background:rgba(239,68,68,0.08);border:1px solid var(--danger);padding:0.75rem 1rem;border-radius:var(--radius-sm);color:var(--danger);font-size:0.86rem;margin-bottom:1rem">
+            <i class="fas fa-exclamation-triangle"></i> <span id="conflictMsg">Notice: Another event is already booked for this date and venue.</span>
+          </div>
+        </div>
+
+        <!-- Section 3: Organizer Contact & Media -->
+        <div style="margin-bottom:2rem">
+          <h3 style="font-size:1.1rem;color:var(--primary);margin-bottom:1.2rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border)">
+            <i class="fas fa-user-tie text-secondary"></i> 3. Organizer Information & Media
+          </h3>
+
+          <div class="grid-2" style="margin-bottom:1rem">
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-user"></i> Lead Organizer Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-input" id="evOrgName" required placeholder="e.g. Dr. K. Ramesh">
+            </div>
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-id-badge"></i> Organizer Type</label>
+              <select class="form-input" id="evOrgType">
+                <option value="faculty">Faculty Member</option>
+                <option value="student">Student Club / Society</option>
+                <option value="company">Company / Industry Partner</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-bottom:1rem">
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-envelope"></i> Contact Email <span class="text-danger">*</span></label>
+              <input type="email" class="form-input" id="evContactEmail" required placeholder="organizer@events.edu">
+            </div>
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-phone"></i> Contact Phone</label>
+              <input type="text" class="form-input" id="evContactPhone" placeholder="+91 98765 43210">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-image"></i> Event Poster URL (optional)</label>
+            <input type="url" class="form-input" id="evImageUrl" placeholder="https://images.unsplash.com/... or leave blank for automatic high-res poster">
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:1rem">
+          <a href="events.html" class="btn btn-outline"><i class="fas fa-times"></i> Cancel</a>
+          <button type="submit" class="btn btn-primary" id="btnSubmitEvent"><i class="fas fa-paper-plane"></i> Submit Event Proposal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <div class="footer-bottom">
+      <div class="footer-bottom-container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+        <div style="display:flex;align-items:center;gap:0.6rem;">
+          <img src="assets/images/logo.png" alt="SCSVMV Logo" style="height:30px;width:auto;">
+          <p style="margin:0">&copy; 2026 EVENTS &bull; Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV).</p>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);font-style:italic">Discover opportunities. Participate in experiences. Build your future.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Require logged-in user
+      const user = Auth.getCurrentUser();
+      if (!user) {
+        window.location.href = 'auth.html?redirect=create-event.html';
+        return;
+      }
+
+      // Populate Categories
+      const catSel = document.getElementById('evCategory');
+      CONFIG.EVENT_CATEGORIES.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        catSel.appendChild(opt);
+      });
+
+      // Populate Departments
+      const deptSel = document.getElementById('evDepartment');
+      CONFIG.DEPARTMENTS.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        deptSel.appendChild(opt);
+      });
+
+      // Pre-fill user data
+      document.getElementById('evOrgName').value = user.name || '';
+      document.getElementById('evContactEmail').value = user.email || '';
+      if (user.role) {
+        document.getElementById('evOrgType').value = user.role === 'admin' ? 'faculty' : user.role;
+      }
+      if (user.department) {
+        deptSel.value = user.department;
+      }
+
+      // Default date to next week
+      const nextWeek = new Date();
+      nextWeek.setDate(nextWeek.getDate() + 10);
+      document.getElementById('evDate').value = nextWeek.toISOString().slice(0, 10);
+    });
+
+    function checkVenueConflict() {
+      const date = document.getElementById('evDate').value;
+      const venue = document.getElementById('evVenue').value.trim();
+      const conflictBox = document.getElementById('conflictAlert');
+
+      if (!date || !venue) {
+        conflictBox.style.display = 'none';
+        return;
+      }
+
+      const allEvents = DB.getAll('events');
+      const conflict = allEvents.find(e => e.date === date && e.venue.toLowerCase() === venue.toLowerCase() && e.approval === 'approved');
+
+      if (conflict) {
+        document.getElementById('conflictMsg').textContent = `Scheduling Notice: "${conflict.title}" is already scheduled at ${conflict.venue} on ${date}. The administrator will review room allotment.`;
+        conflictBox.style.display = 'block';
+      } else {
+        conflictBox.style.display = 'none';
+      }
+    }
+
+    function handleCreateEvent(e) {
+      e.preventDefault();
+      const user = Auth.getCurrentUser();
+
+      const title = document.getElementById('evTitle').value.trim();
+      const category = document.getElementById('evCategory').value;
+      const department = document.getElementById('evDepartment').value;
+      const description = document.getElementById('evDescription').value.trim();
+      const date = document.getElementById('evDate').value;
+      const endDate = document.getElementById('evEndDate').value || date;
+      const time = document.getElementById('evTime').value;
+      const endTime = document.getElementById('evEndTime').value || '17:00';
+      const venue = document.getElementById('evVenue').value.trim();
+      const maxParticipants = parseInt(document.getElementById('evMaxCapacity').value, 10) || 100;
+      const orgName = document.getElementById('evOrgName').value.trim();
+      const orgType = document.getElementById('evOrgType').value;
+      const contactEmail = document.getElementById('evContactEmail').value.trim();
+      const contactPhone = document.getElementById('evContactPhone').value.trim();
+      let imageUrl = document.getElementById('evImageUrl').value.trim();
+
+      if (!imageUrl) {
+        // Automatic category image
+        const imgMap = {
+          'Technical Symposium': 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
+          'Workshop': 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80',
+          'Hackathons': 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80',
+          'Placement Activities': 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80',
+          'Cultural Events': 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80',
+          'Sports': 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80'
+        };
+        imageUrl = imgMap[category] || 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80';
+      }
+
+      const newId = 'EVT' + String(Date.now()).slice(-5);
+
+      const eventObj = {
+        id: newId,
+        title,
+        description,
+        category,
+        date,
+        end_date: endDate,
+        time,
+        end_time: endTime,
+        venue,
+        department,
+        organizer_name: orgName,
+        organizer_type: orgType,
+        organizer_id: user ? user.id : 'USR_FAC',
+        company_name: orgType === 'company' ? orgName : '',
+        status: 'upcoming',
+        approval: user && user.role === 'admin' ? 'approved' : 'pending',
+        max_participants: maxParticipants,
+        registered_count: 0,
+        waitlist_count: 0,
+        image_url: imageUrl,
+        contact_email: contactEmail,
+        contact_phone: contactPhone,
+        created_date: new Date().toISOString().slice(0, 10)
+      };
+
+      DB.insert('events', eventObj);
+
+      DB.logActivity('CREATE_EVENT', `Created event '${title}' (ID: ${newId})`, user ? user.id : 'user');
+
+      // Admin notification
+      DB.insertNotification({
+        title: 'New Event Proposal Awaiting Approval',
+        message: `${orgName} submitted a new ${category}: "${title}".`,
+        type: 'event_approval',
+        recipient_role: 'admin',
+        event_id: newId
+      });
+
+      Toast.show('Event proposal submitted successfully!', 'success');
+
+      setTimeout(() => {
+        if (user && user.role === 'faculty') {
+          window.location.href = 'faculty/dashboard.html';
+        } else if (user && user.role === 'company') {
+          window.location.href = 'company/dashboard.html';
+        } else if (user && user.role === 'admin') {
+          window.location.href = 'admin/manage-events.html';
+        } else {
+          window.location.href = 'events.html';
+        }
+      }, 1200);
+    }
+  </script>
+</body>
+</html>

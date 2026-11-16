@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVENTS | Event Details</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/chatbot.js"></script>
+</head>
+<body>
+
+  <!-- ─── HEADER ─── -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div>
+          <div class="brand-title">EVENTS</div>
+          <span class="brand-tagline-micro">SCSVMV Deemed to be University</span>
+        </div>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul id="mainNavList">
+          <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="events.html" class="active"><i class="fas fa-calendar-days"></i> Events</a></li>
+          <li><a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a></li>
+          <li><a href="verify-certificate.html"><i class="fas fa-certificate"></i> Verify Certificate</a></li>
+          <span id="headerRoleLinkSlot"></span>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+
+        <div class="notif-bell-wrap">
+          <button class="btn-bell" onclick="toggleNotifDropdown(event)">
+            <i class="fas fa-bell"></i>
+            <span class="notif-badge-pill" id="notifBadgePill" style="display:none;">0</span>
+          </button>
+          <div class="notif-dropdown-menu" id="notifDropdownMenu">
+            <div class="notif-menu-header">
+              <h4>Notifications</h4>
+              <span style="font-size:0.75rem;color:var(--secondary);font-weight:600;cursor:pointer;" onclick="toggleNotifDropdown(event)">Close</span>
+            </div>
+            <div class="notif-list-container" id="notifDropdownList"></div>
+          </div>
+        </div>
+
+        <div id="headerUserSlot"></div>
+
+        <button class="mobile-hamburger" onclick="document.querySelector('.desktop-nav').classList.toggle('open');">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── EVENT BANNER HERO ─── -->
+  <div id="eventHeroBanner" style="height:340px;background:var(--primary) center/cover no-repeat;position:relative;display:flex;align-items:flex-end;">
+    <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(16,27,63,0.92) 0%, rgba(16,27,63,0.4) 60%, transparent 100%);"></div>
+    <div class="container" style="position:relative;z-index:2;padding-bottom:2.5rem;">
+      <div style="display:flex;gap:0.6rem;margin-bottom:0.75rem;">
+        <span class="event-badge-tag" id="evCatBadge" style="position:static;"></span>
+        <span class="event-status-pill" id="evStatusBadge" style="position:static;"></span>
+      </div>
+      <h1 id="evHeroTitle" style="color:#ffffff;font-family:'Montserrat',sans-serif;font-size:2.4rem;font-weight:900;line-height:1.2;max-width:900px;"></h1>
+      <p id="evHeroDept" style="color:#CBD5E1;font-size:1.05rem;margin-top:0.4rem;font-weight:500;"></p>
+    </div>
+  </div>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <main class="container">
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:2.2rem;" id="eventLayoutGrid">
+
+      <!-- LEFT COLUMN -->
+      <div>
+        <!-- Schedule Conflict Warning Box -->
+        <div id="scheduleConflictBox" style="display:none;margin-bottom:1.5rem;padding:1rem 1.4rem;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:var(--radius);color:#991B1B;">
+          <div style="display:flex;align-items:center;gap:0.75rem;font-weight:700;font-size:0.95rem;">
+            <i class="fas fa-exclamation-triangle" style="font-size:1.2rem;"></i>
+            <span>Schedule Conflict Warning</span>
+          </div>
+          <p id="scheduleConflictMsg" style="font-size:0.88rem;margin:0.4rem 0 0 2rem;"></p>
+        </div>
+
+        <!-- Description Card -->
+        <div class="form-card" style="margin-bottom:2rem;">
+          <h2 style="font-size:1.3rem;font-weight:800;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;">
+            <i class="fas fa-info-circle" style="color:var(--secondary);"></i> About This Event
+          </h2>
+          <div id="evFullDesc" style="color:var(--text-muted);font-size:1rem;line-height:1.8;white-space:pre-line;"></div>
+
+          <div style="margin-top:1.8rem;padding-top:1.4rem;border-top:1px solid var(--border);">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.6rem;">Tags & Focus Areas</div>
+            <div id="evTagsList" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+          </div>
+        </div>
+
+        <!-- Reviews & Feedback Card -->
+        <div class="form-card" style="margin-bottom:2rem;" id="reviewsCard">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+            <h2 style="font-size:1.3rem;font-weight:800;color:var(--text);display:flex;align-items:center;gap:0.6rem;">
+              <i class="fas fa-star" style="color:var(--warning);"></i> Participant Reviews & Ratings
+            </h2>
+            <div id="avgScoreBadge" style="display:inline-flex;align-items:center;gap:0.4rem;background:var(--warning-bg);color:var(--warning);padding:0.35rem 0.8rem;border-radius:var(--radius-full);font-weight:800;font-size:0.95rem;">
+              <i class="fas fa-star"></i> <span id="avgScoreNum">5.0</span> / 5.0
+            </div>
+          </div>
+
+          <div id="reviewsContainer"></div>
+
+          <!-- Add Review Form -->
+          <div style="margin-top:2.5rem;padding-top:1.8rem;border-top:2px solid var(--border);" id="addReviewSection">
+            <h3 style="font-size:1.15rem;font-weight:800;color:var(--text);margin-bottom:1rem;">
+              <i class="fas fa-pen-nib" style="color:var(--secondary);"></i> Share Your Event Experience
+            </h3>
+            <form id="feedbackForm" onsubmit="handleFeedbackSubmit(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label><i class="fas fa-user"></i> Your Name *</label>
+                  <input type="text" id="fbUserName" placeholder="Full name" required>
+                </div>
+                <div class="form-group">
+                  <label><i class="fas fa-star text-warning"></i> Star Rating *</label>
+                  <select id="fbUserRating" required>
+                    <option value="5">⭐⭐⭐⭐⭐ (5 - Outstanding)</option>
+                    <option value="4">⭐⭐⭐⭐ (4 - Very Good)</option>
+                    <option value="3">⭐⭐⭐ (3 - Average)</option>
+                    <option value="2">⭐⭐ (2 - Below Expectations)</option>
+                    <option value="1">⭐ (1 - Poor)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label><i class="fas fa-heading"></i> Feedback Headline *</label>
+                <input type="text" id="fbReviewTitle" placeholder="e.g. Excellent hands-on industry demo!" required>
+              </div>
+
+              <div class="form-group">
+                <label><i class="fas fa-comment-dots"></i> Detailed Feedback *</label>
+                <textarea id="fbReviewText" rows="3" placeholder="Share what you learned or suggestions for future workshops..." required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label><i class="fas fa-camera"></i> Event Photo URL (Optional)</label>
+                <input type="url" id="fbPhotoUrl" placeholder="https://images.unsplash.com/...">
+                <p class="form-help">Enter an image link from the event to showcase in the community review gallery.</p>
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="btnSubmitFeedback">
+                <i class="fas fa-paper-plane"></i> Submit Verified Review
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDEBAR (Quick Actions & Organizer) -->
+      <div>
+        <!-- Registration Action Card -->
+        <div class="form-card" style="position:sticky;top:90px;margin-bottom:2rem;">
+          <div id="sidebarCapacityMeter" style="margin-bottom:1.5rem;"></div>
+
+          <div id="sidebarRegistrationActions" style="display:flex;flex-direction:column;gap:0.75rem;"></div>
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:1.5rem 0;">
+
+          <!-- Key Event Specs -->
+          <div style="display:flex;flex-direction:column;gap:0.85rem;font-size:0.9rem;">
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+              <i class="fas fa-calendar-day" style="color:var(--secondary);font-size:1.1rem;margin-top:2px;"></i>
+              <div>
+                <strong style="display:block;color:var(--text);">Date & Schedule</strong>
+                <span id="evDateInfo" style="color:var(--text-muted);"></span>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+              <i class="fas fa-clock" style="color:var(--secondary);font-size:1.1rem;margin-top:2px;"></i>
+              <div>
+                <strong style="display:block;color:var(--text);">Time</strong>
+                <span id="evTimeInfo" style="color:var(--text-muted);"></span>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+              <i class="fas fa-map-marker-alt" style="color:var(--secondary);font-size:1.1rem;margin-top:2px;"></i>
+              <div>
+                <strong style="display:block;color:var(--text);">Venue Location</strong>
+                <span id="evVenueInfo" style="color:var(--text-muted);"></span>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+              <i class="fas fa-building" style="color:var(--secondary);font-size:1.1rem;margin-top:2px;"></i>
+              <div>
+                <strong style="display:block;color:var(--text);">Organizing Entity</strong>
+                <span id="evOrganizerInfo" style="color:var(--text-muted);"></span>
+              </div>
+            </div>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:1.5rem 0;">
+
+          <!-- Social Share Widget -->
+          <div>
+            <div style="font-weight:700;font-size:0.85rem;color:var(--text);margin-bottom:0.6rem;">
+              <i class="fas fa-share-nodes" style="color:var(--secondary);"></i> Share this Event
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <button class="btn btn-secondary btn-sm" onclick="shareOnWhatsApp()" style="background:#25D366;color:#fff;border:none;"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+              <button class="btn btn-secondary btn-sm" onclick="shareOnLinkedIn()" style="background:#0A66C2;color:#fff;border:none;"><i class="fab fa-linkedin-in"></i> LinkedIn</button>
+              <button class="btn btn-secondary btn-sm" onclick="copyEventLink()"><i class="fas fa-copy"></i> Copy Link</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campus Venue & Assurance Photo Card -->
+        <div style="position:relative;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid rgba(255,255,255,0.15);min-height:220px;display:flex;flex-direction:column;justify-content:flex-end;padding:1.6rem;color:#ffffff;background:url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80') center/cover no-repeat;margin-bottom:2rem;">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(16,27,63,0.2) 0%, rgba(16,27,63,0.85) 60%, rgba(10,17,40,0.96) 100%);"></div>
+          <div style="position:relative;z-index:2">
+            <span class="campus-gallery-badge" style="margin-bottom:0.6rem"><i class="fas fa-university"></i> SCSVMV Campus Host</span>
+            <h4 style="margin-bottom:0.35rem;color:#ffffff;font-size:1.1rem;font-weight:800">Grand University Campus</h4>
+            <p style="font-size:0.84rem;color:#CBD5E1;line-height:1.5;margin-bottom:0.8rem">Equipped with gigabit Wi-Fi, air-conditioned smart auditoriums, and contactless QR check-in gates.</p>
+            <span style="font-size:0.8rem;color:#34D399;font-weight:700;"><i class="fas fa-check-circle"></i> Official Verified Event</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-bottom" style="border-top:none;padding-top:0;">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <img src="assets/images/logo.png" alt="SCSVMV Logo" style="height:32px;width:auto;">
+          <div>&copy; 2026 EVENTS &bull; Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV). All rights reserved.</div>
+        </div>
+        <div style="display:flex;gap:1.5rem;">
+          <a href="index.html" style="color:#94A3B8;"><i class="fas fa-home"></i> Home</a>
+          <a href="events.html" style="color:#94A3B8;"><i class="fas fa-calendar-days"></i> Events</a>
+          <a href="calendar.html" style="color:#94A3B8;"><i class="fas fa-calendar"></i> Calendar</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── SCRIPT LOGIC ─── -->
+  <script>
+    let currentEvent = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const eventId = new URLSearchParams(window.location.search).get('id');
+      if (!eventId || !window.DB) {
+        window.location.href = 'events.html';
+        return;
+      }
+
+      currentEvent = window.DB.getById('events', 'id', eventId);
+      if (!currentEvent) {
+        showToast('Event not found.', 'error');
+        setTimeout(() => window.location.href = 'events.html', 1500);
+        return;
+      }
+
+      renderEventDetails(currentEvent);
+      checkScheduleConflict(currentEvent);
+      renderReviews(currentEvent.id);
+    });
+
+    function renderEventDetails(ev) {
+      document.title = `${ev.title} — EVENTS`;
+
+      // Hero Banner
+      const heroBanner = document.getElementById('eventHeroBanner');
+      if (ev.image_url) {
+        heroBanner.style.backgroundImage = `url('${ev.image_url}')`;
+      }
+      document.getElementById('evCatBadge').innerHTML = `<i class="fas fa-tag"></i> ${ev.category}`;
+      document.getElementById('evStatusBadge').textContent = ev.status;
+      document.getElementById('evStatusBadge').className = `event-status-pill status-${ev.status}`;
+
+      document.getElementById('evHeroTitle').textContent = ev.title;
+      document.getElementById('evHeroDept').textContent = `${ev.department || 'University'} • Organized by ${ev.organizer_name}`;
+
+      // Body Details
+      document.getElementById('evFullDesc').textContent = ev.description;
+      const tagsContainer = document.getElementById('evTagsList');
+      if (ev.tags) {
+        tagsContainer.innerHTML = ev.tags.split(',').map(t => `
+          <span style="font-size:0.8rem;background:var(--secondary-light);color:var(--secondary);padding:0.25rem 0.75rem;border-radius:20px;font-weight:600;">#${t.trim()}</span>
+        `).join('');
+      }
+
+      // Sidebar Specs
+      document.getElementById('evDateInfo').textContent = `${formatDate(ev.date)} ${ev.end_date && ev.end_date !== ev.date ? 'to ' + formatDate(ev.end_date) : ''}`;
+      document.getElementById('evTimeInfo').textContent = `${formatTime(ev.time)} ${ev.end_time ? '– ' + formatTime(ev.end_time) : ''}`;
+      document.getElementById('evVenueInfo').textContent = ev.venue;
+      document.getElementById('evOrganizerInfo').textContent = `${ev.organizer_name} (${ev.organizer_type.toUpperCase()})`;
+
+      // Capacity & Action Button
+      const current = Number(ev.registered_count || 0);
+      const max = Number(ev.max_participants || 100);
+      const pct = Math.min(100, Math.round((current / max) * 100));
+      const isFull = current >= max;
+
+      document.getElementById('sidebarCapacityMeter').innerHTML = `
+        <div style="display:flex;justify-content:space-between;font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:0.4rem;">
+          <span>Capacity: ${current} / ${max} Seats</span>
+          <span>${pct}%</span>
+        </div>
+        <div class="capacity-meter-bar" style="height:8px;">
+          <div class="capacity-meter-fill" style="width:${pct}%;${isFull ? 'background:#EC4899;' : ''}"></div>
+        </div>
+        <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">
+          ${isFull ? 'All confirmed seats reserved. New applicants are placed on automated waitlist.' : 'Confirmed digital QR pass issued upon registration.'}
+        </p>
+      `;
+
+      // Check if logged-in user is already registered
+      const session = window.Auth ? window.Auth.getSession() : null;
+      let alreadyReg = null;
+      if (session) {
+        const regs = window.DB.getAll('registrations');
+        alreadyReg = regs.find(r => r.event_id === ev.id && r.user_id === session.userId && r.status !== 'cancelled');
+      }
+
+      const actionsSlot = document.getElementById('sidebarRegistrationActions');
+      if (alreadyReg) {
+        actionsSlot.innerHTML = `
+          <div style="background:var(--success-bg);color:var(--success);padding:0.9rem;border-radius:10px;text-align:center;font-weight:700;font-size:0.9rem;border:1px solid rgba(16,185,129,0.3);">
+            <i class="fas fa-check-circle"></i> You are registered for this event!
+          </div>
+          <a href="profile.html" class="btn btn-outline" style="width:100%;"><i class="fas fa-ticket-alt"></i> View Your Ticket Pass</a>
+        `;
+      } else {
+        actionsSlot.innerHTML = `
+          <a href="register.html?event=${ev.id}" class="btn btn-primary btn-lg" style="width:100%;${isFull ? 'background:#EC4899;' : ''}">
+            <i class="fas ${isFull ? 'fa-hourglass-half' : 'fa-ticket-alt'}"></i> ${isFull ? 'Join Waitlist Queue' : 'Register for Event'}
+          </a>
+        `;
+      }
+    }
+
+    function checkScheduleConflict(ev) {
+      const session = window.Auth ? window.Auth.getSession() : null;
+      if (!session) return;
+
+      const regs = window.DB.getAll('registrations').filter(r =>
+        r.user_id === session.userId && r.status === 'confirmed' && r.event_id !== ev.id
+      );
+
+      for (const r of regs) {
+        const other = window.DB.getById('events', 'id', r.event_id);
+        if (other && other.date === ev.date && other.time === ev.time) {
+          document.getElementById('scheduleConflictBox').style.display = 'block';
+          document.getElementById('scheduleConflictMsg').textContent = `You have already confirmed registration for "${other.title}" on the same date (${other.date} at ${other.time}). Attending both may cause conflict.`;
+          break;
+        }
+      }
+    }
+
+    function renderReviews(eventId) {
+      const allFeedback = window.DB.getAll('feedback').filter(f => f.event_id === eventId);
+      const container = document.getElementById('reviewsContainer');
+      const scoreNum = document.getElementById('avgScoreNum');
+
+      if (allFeedback.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:0.9rem;">
+            <i class="far fa-comment-dots" style="font-size:2rem;display:block;margin-bottom:0.5rem;opacity:0.4;"></i>
+            No reviews submitted yet. Be the first participant to review!
+          </div>
+        `;
+        scoreNum.textContent = '5.0';
+        return;
+      }
+
+      const totalScore = allFeedback.reduce((acc, f) => acc + Number(f.rating || 5), 0);
+      const avg = (totalScore / allFeedback.length).toFixed(1);
+      scoreNum.textContent = avg;
+
+      container.innerHTML = allFeedback.map(f => {
+        const stars = '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating);
+        const photosHtml = (f.photos && f.photos.length) ? `
+          <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;">
+            ${f.photos.map(p => `<img src="${p}" alt="Review photo" style="width:70px;height:70px;border-radius:8px;object-fit:cover;border:1px solid var(--border);">`).join('')}
+          </div>
+        ` : '';
+
+        return `
+          <div style="padding:1.2rem;border:1px solid var(--border);border-radius:12px;margin-bottom:1rem;background:var(--surface-alt);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
+              <div>
+                <strong style="color:var(--text);font-size:0.95rem;">${f.participant_name}</strong>
+                <span style="font-size:0.75rem;color:var(--text-muted);margin-left:0.5rem;">${formatDate(f.date)}</span>
+              </div>
+              <div style="color:var(--warning);font-size:0.95rem;letter-spacing:1px;">${stars}</div>
+            </div>
+            <h4 style="font-size:0.95rem;font-weight:700;color:var(--text);margin-bottom:0.35rem;">${f.title}</h4>
+            <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.6;">${f.review}</p>
+            ${photosHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleFeedbackSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('fbUserName').value.trim();
+      const rating = Number(document.getElementById('fbUserRating').value);
+      const title = document.getElementById('fbReviewTitle').value.trim();
+      const review = document.getElementById('fbReviewText').value.trim();
+      const photoUrl = document.getElementById('fbPhotoUrl').value.trim();
+
+      const newFeedback = {
+        id: 'FBK_' + Date.now(),
+        event_id: currentEvent.id,
+        participant_name: name,
+        rating,
+        title,
+        review,
+        date: new Date().toISOString().slice(0, 10),
+        photos: photoUrl ? [photoUrl] : []
+      };
+
+      window.DB.insert('feedback', newFeedback);
+      showToast('Thank you! Your review has been added to EVENTS.', 'success');
+      document.getElementById('feedbackForm').reset();
+      renderReviews(currentEvent.id);
+    }
+
+    function shareOnWhatsApp() {
+      const text = `Check out "${currentEvent.title}" on EVENTS: ${window.location.href}`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function shareOnLinkedIn() {
+      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank');
+    }
+
+    function copyEventLink() {
+      navigator.clipboard.writeText(window.location.href);
+      showToast('Event link copied to clipboard!', 'info');
+    }
+  </script>
+</body>
+</html>

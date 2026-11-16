@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Participant Directory | EVENTS</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="js/icons.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo">
+        <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div class="logo-text">
+          <span class="logo-title">EVENTS</span>
+          <span class="logo-tagline">SCSVMV Deemed to be University</span>
+        </div>
+      </a>
+      
+      <nav class="main-nav">
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="events.html" class="nav-link"><i class="fas fa-calendar-days"></i> Events</a></li>
+          <li><a href="calendar.html" class="nav-link"><i class="fas fa-calendar"></i> Calendar</a></li>
+          <li><a href="participants.html" class="nav-link active"><i class="fas fa-users"></i> Directory</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+        <div class="header-user-menu" id="headerUserMenu"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── VISUAL PAGE HERO ─── -->
+  <section class="visual-page-hero" style="background-image:url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1600&q=80')">
+    <div class="container">
+      <div style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.88rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#93C5FD;margin-bottom:1rem;text-shadow:0 2px 6px rgba(0,0,0,0.8)">
+        <i class="fas fa-users" style="color:#FBBF24"></i> University Community Roster
+      </div>
+      <h1 class="visual-page-hero-title">
+        Event Participant <span>Directory</span>
+      </h1>
+      <p class="visual-page-hero-sub">
+        Search registered participants, check attendance records, and review student rosters across all university programs.
+      </p>
+    </div>
+  </section>
+
+  <div class="page-container" style="max-width:1150px;margin:2.5rem auto;padding:0 1.2rem">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
+      <button class="btn btn-secondary btn-sm" onclick="exportParticipantsCSV()"><i class="fas fa-file-csv"></i> Export Roster CSV</button>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="dash-card" style="margin-bottom:1.5rem">
+      <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:260px;position:relative">
+          <i class="fas fa-search" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.85rem;pointer-events:none"></i>
+          <input type="text" class="form-input" id="partSearchInput" placeholder="Search by participant name, roll number, or ticket..." style="padding:0.45rem 0.8rem 0.45rem 2.2rem;font-size:0.88rem">
+        </div>
+        <div style="min-width:220px">
+          <select class="form-input" id="partEventFilter" style="padding:0.45rem 0.8rem;font-size:0.88rem">
+            <option value="all">📅 All Events</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Participants Table -->
+    <div class="dash-card">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><i class="fas fa-ticket-alt"></i> Ticket ID</th>
+              <th><i class="fas fa-user"></i> Participant Name</th>
+              <th><i class="fas fa-id-card"></i> Register No / ID</th>
+              <th><i class="fas fa-graduation-cap"></i> Department</th>
+              <th><i class="fas fa-calendar-check"></i> Event Title</th>
+              <th><i class="fas fa-info-circle"></i> Registration Status</th>
+              <th><i class="fas fa-qrcode"></i> Check-in Status</th>
+            </tr>
+          </thead>
+          <tbody id="participantsTableBody">
+            <tr><td colspan="7" style="text-align:center;padding:2rem"><i class="fas fa-spinner fa-spin"></i> Loading participants...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <div class="footer-bottom">
+      <div class="footer-bottom-container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+        <div style="display:flex;align-items:center;gap:0.6rem;">
+          <img src="assets/images/logo.png" alt="SCSVMV Logo" style="height:30px;width:auto;">
+          <p style="margin:0">&copy; 2026 EVENTS &bull; Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV).</p>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);font-style:italic">Discover opportunities. Participate in experiences. Build your future.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/chatbot.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    let allParticipants = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      allParticipants = DB.getAll('registrations');
+      populateEventFilter();
+      renderParticipants();
+
+      document.getElementById('partSearchInput').addEventListener('input', renderParticipants);
+      document.getElementById('partEventFilter').addEventListener('change', renderParticipants);
+    });
+
+    function populateEventFilter() {
+      const select = document.getElementById('partEventFilter');
+      const events = DB.getAll('events');
+      events.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.id;
+        opt.textContent = `${e.title} (${e.date})`;
+        select.appendChild(opt);
+      });
+    }
+
+    function renderParticipants() {
+      const query = document.getElementById('partSearchInput').value.toLowerCase().trim();
+      const evFilter = document.getElementById('partEventFilter').value;
+
+      let filtered = allParticipants;
+      if (evFilter !== 'all') {
+        filtered = filtered.filter(p => p.event_id === evFilter);
+      }
+      if (query) {
+        filtered = filtered.filter(p => 
+          (p.student_name && p.student_name.toLowerCase().includes(query)) ||
+          (p.name && p.name.toLowerCase().includes(query)) ||
+          (p.register_number && p.register_number.toLowerCase().includes(query)) ||
+          (p.ticket_id && p.ticket_id.toLowerCase().includes(query)) ||
+          (p.department && p.department.toLowerCase().includes(query))
+        );
+      }
+
+      const tbody = document.getElementById('participantsTableBody');
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:var(--text-muted)">No registered participants match the criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(p => `
+        <tr>
+          <td><code style="font-weight:700;color:var(--secondary)">${p.ticket_id}</code></td>
+          <td><strong>${p.student_name || p.name || 'Anonymous Student'}</strong></td>
+          <td>${p.register_number || 'N/A'}</td>
+          <td>${p.department || 'Campus'}</td>
+          <td><div style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.event_title}</div></td>
+          <td><span class="badge ${p.status === 'waitlist' ? 'status-waitlist' : 'status-confirmed'}">${p.status.toUpperCase()}</span></td>
+          <td>
+            ${p.attended 
+              ? '<span class="status-badge status-confirmed"><i class="fas fa-check"></i> Attended</span>' 
+              : '<span class="status-badge" style="background:#f3f4f6;color:#6b7280"><i class="fas fa-clock"></i> Pending</span>'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function exportParticipantsCSV() {
+      DB.downloadCSV('campusconnect_participants', allParticipants);
+    }
+  </script>
+</body>
+</html>

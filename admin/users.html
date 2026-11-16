@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Directory & Roles | EVENTS Admin</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="../js/icons.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="../index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div class="logo-text">
+          <span class="logo-title">EVENTS</span>
+          <span class="logo-tagline">SCSVMV &bull; Administrator Console</span>
+        </div>
+      </a>
+      
+      <div class="header-actions">
+        <a href="dashboard.html" class="btn btn-outline btn-sm"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+        <div class="header-user-menu" id="headerUserMenu"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-layout">
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-univ-badge">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo">
+        <span>SCSVMV Deemed to be University</span>
+      </div>
+      <ul class="sidebar-menu-list">
+        <li class="sidebar-menu-heading">Navigation</li>
+        <li><a href="dashboard.html" class="sidebar-menu-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="manage-events.html" class="sidebar-menu-link"><i class="fas fa-calendar-alt"></i> Manage Events</a></li>
+        <li><a href="users.html" class="sidebar-menu-link active"><i class="fas fa-users-cog"></i> Users & Roles</a></li>
+        <li><a href="attendance-reports.html" class="sidebar-menu-link"><i class="fas fa-chart-line"></i> Attendance Reports</a></li>
+        <li><a href="system-settings.html" class="sidebar-menu-link"><i class="fas fa-sliders-h"></i> Settings</a></li>
+      </ul>
+    </aside>
+
+    <main class="dashboard-main">
+      <div style="position:relative;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);border:1px solid rgba(255,255,255,0.15);padding:2.2rem 2rem;color:#fff;background:url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&q=80') center/cover no-repeat;margin-bottom:2rem">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg, rgba(10,17,40,0.92) 0%, rgba(16,27,63,0.85) 50%, rgba(30,41,90,0.94) 100%);"></div>
+        <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem">
+          <div>
+            <span class="campus-gallery-badge" style="margin-bottom:0.6rem"><i class="fas fa-users-cog"></i> Role-Based Governance</span>
+            <h1 style="font-family:'Montserrat',sans-serif;font-size:1.9rem;font-weight:900;color:#ffffff;margin-bottom:0.35rem">User Accounts & RBAC Directory</h1>
+            <p style="color:#CBD5E1;font-size:0.92rem;max-width:640px;line-height:1.5">Govern student registrations, faculty organizers, corporate recruiters, and platform administrators.</p>
+          </div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="exportUsersCSV()"><i class="fas fa-file-csv"></i> Export Users CSV</button>
+            <button class="btn btn-primary btn-sm" onclick="openAddUserModal()"><i class="fas fa-user-plus"></i> Add Account</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters & Search -->
+      <div class="dash-card" style="margin-bottom:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap">
+          <div style="flex:1;min-width:280px;position:relative">
+            <i class="fas fa-search" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.85rem;pointer-events:none"></i>
+            <input type="text" class="form-input" id="userSearch" placeholder="Search by name, email, register no, department, or company..." style="font-size:0.88rem;padding:0.45rem 0.8rem 0.45rem 2.2rem">
+          </div>
+          <div style="display:flex;gap:0.4rem;flex-wrap:wrap">
+            <button class="chip active" onclick="setRoleFilter('all', this)"><i class="fas fa-users"></i> All Accounts</button>
+            <button class="chip" onclick="setRoleFilter('student', this)"><i class="fas fa-user-graduate"></i> Students</button>
+            <button class="chip" onclick="setRoleFilter('faculty', this)"><i class="fas fa-chalkboard-teacher"></i> Faculty</button>
+            <button class="chip" onclick="setRoleFilter('company', this)"><i class="fas fa-building"></i> Companies</button>
+            <button class="chip" onclick="setRoleFilter('admin', this)"><i class="fas fa-shield-alt"></i> Admins</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="dash-card">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-user"></i> User Details</th>
+                <th><i class="fas fa-id-badge"></i> Role</th>
+                <th><i class="fas fa-university"></i> Institution / Org</th>
+                <th><i class="fas fa-id-card"></i> Identifier / Reg No</th>
+                <th><i class="fas fa-envelope-open-text"></i> Email OTP Status</th>
+                <th><i class="fas fa-calendar-alt"></i> Member Since</th>
+                <th style="text-align:right"><i class="fas fa-cog"></i> Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="7" style="text-align:center;padding:2rem"><i class="fas fa-spinner fa-spin"></i> Loading users...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add User Modal -->
+  <div class="modal-overlay" id="addUserModal">
+    <div class="modal-container" style="max-width:550px">
+      <div class="modal-header">
+        <h3 class="modal-title">Create User Account</h3>
+        <button class="modal-close" onclick="closeAddUserModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <form onsubmit="handleCreateUser(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom:1rem">
+            <label class="form-label"><i class="fas fa-user"></i> Full Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-input" id="newUserName" required placeholder="e.g. John Doe">
+          </div>
+
+          <div class="form-group" style="margin-bottom:1rem">
+            <label class="form-label"><i class="fas fa-envelope"></i> Email Address <span class="text-danger">*</span></label>
+            <input type="email" class="form-input" id="newUserEmail" required placeholder="user@events.edu">
+          </div>
+
+          <div class="grid-2" style="margin-bottom:1rem">
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-user-tag"></i> Role <span class="text-danger">*</span></label>
+              <select class="form-input" id="newUserRole" onchange="toggleRoleFields(this.value)" required>
+                <option value="student">Student</option>
+                <option value="faculty">Faculty / Organizer</option>
+                <option value="company">Company / Industry</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-lock"></i> Password <span class="text-danger">*</span></label>
+              <input type="password" class="form-input" id="newUserPass" required value="Campus@123">
+            </div>
+          </div>
+
+          <div class="form-group" id="deptGroup" style="margin-bottom:1rem">
+            <label class="form-label"><i class="fas fa-graduation-cap"></i> Department</label>
+            <input type="text" class="form-input" id="newUserDept" placeholder="e.g. Computer Science & Engineering">
+          </div>
+
+          <div class="form-group" id="regGroup" style="margin-bottom:1rem">
+            <label class="form-label"><i class="fas fa-id-card"></i> Register Number / ID</label>
+            <input type="text" class="form-input" id="newUserReg" placeholder="e.g. 11219A001">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-sm" onclick="closeAddUserModal()"><i class="fas fa-times"></i> Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-check"></i> Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/script.js"></script>
+  <script>
+    let activeRoleFilter = 'all';
+    let allUsers = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Auth.requireRole(['admin'], '../auth.html');
+      if (!user) return;
+
+      loadUsers();
+
+      document.getElementById('userSearch').addEventListener('input', renderUsers);
+    });
+
+    function loadUsers() {
+      allUsers = Auth.getAllUsers();
+      renderUsers();
+    }
+
+    function setRoleFilter(role, btn) {
+      activeRoleFilter = role;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderUsers();
+    }
+
+    function renderUsers() {
+      const query = document.getElementById('userSearch').value.toLowerCase().trim();
+      let filtered = allUsers;
+
+      if (activeRoleFilter !== 'all') {
+        filtered = filtered.filter(u => (u.role || u.user_type) === activeRoleFilter);
+      }
+
+      if (query) {
+        filtered = filtered.filter(u => 
+          (u.name && u.name.toLowerCase().includes(query)) ||
+          (u.email && u.email.toLowerCase().includes(query)) ||
+          (u.register_number && u.register_number.toLowerCase().includes(query)) ||
+          (u.department && u.department.toLowerCase().includes(query)) ||
+          (u.company_name && u.company_name.toLowerCase().includes(query))
+        );
+      }
+
+      const tbody = document.getElementById('usersTableBody');
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:var(--text-muted)">No matching users found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(u => {
+        const role = u.role || u.user_type || 'student';
+        let roleBadge = '';
+        if (role === 'admin') roleBadge = '<span class="badge" style="background:#fef2f2;color:#dc2626"><i class="fas fa-shield-alt"></i> Admin</span>';
+        else if (role === 'faculty') roleBadge = '<span class="badge" style="background:#eff6ff;color:#2563eb"><i class="fas fa-chalkboard-teacher"></i> Faculty</span>';
+        else if (role === 'company') roleBadge = '<span class="badge" style="background:#ecfdf5;color:#059669"><i class="fas fa-building"></i> Company</span>';
+        else roleBadge = '<span class="badge" style="background:var(--secondary-light);color:var(--secondary)"><i class="fas fa-user-graduate"></i> Student</span>';
+
+        const verifiedBadge = u.verified 
+          ? '<span class="status-badge status-confirmed"><i class="fas fa-check-circle"></i> OTP Verified</span>'
+          : '<span class="status-badge status-waitlist"><i class="fas fa-clock"></i> Unverified</span>';
+
+        const initial = (u.name || 'U').charAt(0).toUpperCase();
+
+        return `
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:0.75rem">
+                <div style="width:36px;height:36px;border-radius:10px;background:var(--secondary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700">
+                  ${initial}
+                </div>
+                <div>
+                  <div style="font-weight:700;color:var(--primary)">${u.name}</div>
+                  <div style="font-size:0.78rem;color:var(--text-muted)">${u.email}</div>
+                </div>
+              </div>
+            </td>
+            <td>${roleBadge}</td>
+            <td>${u.company_name || u.department || 'General University'}</td>
+            <td><code>${u.register_number || u.faculty_id || u.id}</code></td>
+            <td>${verifiedBadge}</td>
+            <td><span style="font-size:0.82rem;color:var(--text-muted)">${u.created_at ? new Date(u.created_at).toLocaleDateString() : 'Active'}</span></td>
+            <td style="text-align:right">
+              ${u.role !== 'admin' ? `
+                <button class="btn btn-ghost btn-xs text-danger" onclick="deleteUser('${u.id}')" title="Delete User"><i class="fas fa-trash"></i></button>
+              ` : '<span style="font-size:0.75rem;color:var(--text-muted)">Protected</span>'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openAddUserModal() {
+      document.getElementById('addUserModal').classList.add('active');
+    }
+
+    function closeAddUserModal() {
+      document.getElementById('addUserModal').classList.remove('active');
+    }
+
+    function toggleRoleFields(role) {
+      const reg = document.getElementById('regGroup');
+      const dept = document.getElementById('deptGroup');
+      if (role === 'company') {
+        dept.querySelector('label').textContent = 'Industry Sector / Domain';
+        reg.querySelector('label').textContent = 'Corporate Website';
+      } else {
+        dept.querySelector('label').textContent = 'Department';
+        reg.querySelector('label').textContent = 'Register Number / ID';
+      }
+    }
+
+    function handleCreateUser(e) {
+      e.preventDefault();
+      const name = document.getElementById('newUserName').value.trim();
+      const email = document.getElementById('newUserEmail').value.trim();
+      const role = document.getElementById('newUserRole').value;
+      const pass = document.getElementById('newUserPass').value.trim();
+      const dept = document.getElementById('newUserDept').value.trim();
+      const reg = document.getElementById('newUserReg').value.trim();
+
+      const newId = 'USR_' + role.toUpperCase().slice(0, 3) + '_' + String(Date.now()).slice(-4);
+
+      const userObj = {
+        id: newId,
+        name,
+        email,
+        role,
+        department: role !== 'company' ? dept : '',
+        company_name: role === 'company' ? name : '',
+        industry: role === 'company' ? dept : '',
+        register_number: reg,
+        password: pass,
+        verified: true,
+        created_at: new Date().toISOString()
+      };
+
+      allUsers.push(userObj);
+      localStorage.setItem('campusconnect_users', JSON.stringify(allUsers));
+      DB.logActivity('ADMIN_CREATE_USER', `Created new user ${name} (${email}) with role ${role}`, 'admin');
+
+      Toast.show(`Account for ${name} created successfully!`, 'success');
+      closeAddUserModal();
+      loadUsers();
+    }
+
+    function deleteUser(userId) {
+      if (confirm('Permanently delete this user account?')) {
+        allUsers = allUsers.filter(u => u.id !== userId);
+        localStorage.setItem('campusconnect_users', JSON.stringify(allUsers));
+        DB.logActivity('ADMIN_DELETE_USER', `Deleted user ID: ${userId}`, 'admin');
+        Toast.show('User account removed.', 'info');
+        loadUsers();
+      }
+    }
+
+    function exportUsersCSV() {
+      DB.downloadCSV('campusconnect_users_directory', allUsers);
+    }
+  </script>
+</body>
+</html>

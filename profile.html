@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVENTS | Student Hub & Passes</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/certificate.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/chatbot.js"></script>
+</head>
+<body>
+
+  <!-- ─── HEADER ─── -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div>
+          <div class="brand-title">EVENTS</div>
+          <span class="brand-tagline-micro">SCSVMV Deemed to be University</span>
+        </div>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul id="mainNavList">
+          <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="events.html"><i class="fas fa-calendar-days"></i> Events</a></li>
+          <li><a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a></li>
+          <li><a href="verify-certificate.html"><i class="fas fa-certificate"></i> Verify Certificate</a></li>
+          <span id="headerRoleLinkSlot"></span>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+
+        <div class="notif-bell-wrap">
+          <button class="btn-bell" onclick="toggleNotifDropdown(event)">
+            <i class="fas fa-bell"></i>
+            <span class="notif-badge-pill" id="notifBadgePill" style="display:none;">0</span>
+          </button>
+          <div class="notif-dropdown-menu" id="notifDropdownMenu">
+            <div class="notif-menu-header">
+              <h4>Notifications</h4>
+              <span style="font-size:0.75rem;color:var(--secondary);font-weight:600;cursor:pointer;" onclick="toggleNotifDropdown(event)">Close</span>
+            </div>
+            <div class="notif-list-container" id="notifDropdownList"></div>
+          </div>
+        </div>
+
+        <div id="headerUserSlot"></div>
+
+        <button class="mobile-hamburger" onclick="document.querySelector('.desktop-nav').classList.toggle('open');">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── PROFILE HERO (CAMPUS COVER BANNER) ─── -->
+  <section class="campus-cover-banner" style="background-image:url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80');height:auto;padding:3.5rem 1.5rem 2.5rem;border-bottom:1px solid rgba(255,255,255,0.08);">
+    <div class="container" style="position:relative;z-index:2;padding:0;display:flex;align-items:center;gap:1.8rem;flex-wrap:wrap;">
+      <div style="width:88px;height:88px;border-radius:24px;background:linear-gradient(135deg, var(--secondary), var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-size:2.2rem;font-weight:900;box-shadow:0 8px 24px rgba(65,105,225,0.4);border:3px solid rgba(255,255,255,0.25);" id="profileAvatarSlot">
+        AV
+      </div>
+
+      <div style="flex:1;min-width:260px;">
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <h1 style="font-family:'Montserrat',sans-serif;font-size:2rem;font-weight:900;color:#ffffff;" id="profileName">Aditya Verma</h1>
+          <span class="role-badge student" id="profileRoleBadge">STUDENT</span>
+        </div>
+        <p style="color:#E2E8F0;font-size:0.95rem;margin-top:0.3rem;" id="profileSubtext">
+          Computer Science & Engineering &bull; Register No: CC2023001
+        </p>
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
+          <img src="assets/images/logo.png" alt="SCSVMV Logo" style="height:24px;width:auto;">
+          <span style="font-size:0.8rem;color:#E2E8F0;font-weight:600;">Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV)</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.8rem;flex-wrap:wrap;" id="profileActionBtnsSlot">
+        <a href="events.html" class="btn btn-primary"><i class="fas fa-compass"></i> Discover Events</a>
+        <button class="btn btn-secondary" onclick="openEditProfileModal()"><i class="fas fa-user-edit"></i> Edit Profile</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── DASHBOARD BODY ─── -->
+  <main class="container">
+    <!-- Quick Metric Cards -->
+    <div class="kpi-metrics-grid">
+      <div class="kpi-card">
+        <div class="kpi-card-icon kpi-icon-blue"><i class="fas fa-ticket-alt"></i></div>
+        <div class="kpi-card-info">
+          <div class="kpi-card-val" id="statMyTicketsCount">0</div>
+          <div class="kpi-card-lbl">My Event Passes</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-card-icon kpi-icon-violet"><i class="fas fa-certificate"></i></div>
+        <div class="kpi-card-info">
+          <div class="kpi-card-val" id="statMyCertificatesCount">0</div>
+          <div class="kpi-card-lbl">Earned Certificates</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-card-icon kpi-icon-green"><i class="fas fa-user-check"></i></div>
+        <div class="kpi-card-info">
+          <div class="kpi-card-val" id="statAttendancePercent">0%</div>
+          <div class="kpi-card-lbl">Attendance Check-in</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-card-icon kpi-icon-amber"><i class="fas fa-heart"></i></div>
+        <div class="kpi-card-info">
+          <div class="kpi-card-val" id="statFavoritesCount">0</div>
+          <div class="kpi-card-lbl">Wishlist Events</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabbed Content Section -->
+    <div class="table-card" style="padding:0;">
+      <!-- Tab Header -->
+      <div style="display:flex;border-bottom:1px solid var(--border);background:var(--surface-alt);overflow-x:auto;">
+        <button class="auth-tab-btn active" id="tabPassesBtn" onclick="switchProfileTab('passes')" style="border-radius:0;padding:1rem 1.6rem;">
+          <i class="fas fa-qrcode"></i> My Passes & QR Tickets
+        </button>
+        <button class="auth-tab-btn" id="tabCertificatesBtn" onclick="switchProfileTab('certificates')" style="border-radius:0;padding:1rem 1.6rem;">
+          <i class="fas fa-award"></i> Verified Certificates
+        </button>
+        <button class="auth-tab-btn" id="tabWishlistBtn" onclick="switchProfileTab('wishlist')" style="border-radius:0;padding:1rem 1.6rem;">
+          <i class="fas fa-heart"></i> Saved Wishlist
+        </button>
+      </div>
+
+      <!-- Tab 1: Passes -->
+      <div id="tabContentPasses" style="padding:1.8rem;">
+        <div id="passesContainerGrid" class="events-grid"></div>
+      </div>
+
+      <!-- Tab 2: Certificates -->
+      <div id="tabContentCertificates" style="padding:1.8rem;display:none;">
+        <div id="certificatesContainerGrid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:1.5rem;"></div>
+      </div>
+
+      <!-- Tab 3: Wishlist -->
+      <div id="tabContentWishlist" style="padding:1.8rem;display:none;">
+        <div id="wishlistContainerGrid" class="events-grid"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ─── QR TICKET MODAL ─── -->
+  <div class="modal-overlay" id="qrTicketPassModal">
+    <div class="modal-card" style="max-width:440px;text-align:center;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-qrcode text-secondary"></i> Official Event QR Pass</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('qrTicketPassModal').classList.remove('open')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4 id="passModalEventTitle" style="font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:0.4rem;"></h4>
+        <p id="passModalEventDate" style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.2rem;"></p>
+
+        <div id="modalQrCodeBox" style="display:flex;justify-content:center;margin:1rem 0;"></div>
+
+        <div style="font-family:monospace;font-size:1.05rem;font-weight:800;color:var(--secondary);background:var(--surface-alt);padding:0.4rem 0.8rem;border-radius:6px;display:inline-block;border:1px solid var(--border);" id="passModalTicketId">
+        </div>
+
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-top:1.2rem;">
+          Present this QR ticket at the entrance scanner to verify your attendance and unlock your digital certificate.
+        </p>
+      </div>
+      <div class="modal-footer" style="justify-content:center;">
+        <button class="btn btn-secondary btn-sm" onclick="window.print()"><i class="fas fa-print"></i> Print Pass</button>
+        <button class="btn btn-primary btn-sm" onclick="document.getElementById('qrTicketPassModal').classList.remove('open')"><i class="fas fa-times"></i> Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CERTIFICATE MODAL ─── -->
+  <div class="modal-overlay" id="certificateViewerModal">
+    <div class="modal-card" style="max-width:880px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-award text-secondary"></i> Digital Certificate of Participation</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('certificateViewerModal').classList.remove('open')">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:1.5rem;overflow-x:auto;">
+        <div id="certPreviewContainer"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="printActiveCert()"><i class="fas fa-print"></i> Print Certificate</button>
+        <button class="btn btn-primary" onclick="downloadActiveCert()"><i class="fas fa-download"></i> Download Image (PNG)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EDIT PROFILE MODAL ─── -->
+  <div class="modal-overlay" id="editProfileModal">
+    <div class="modal-card" style="max-width:540px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-user-edit text-secondary"></i> Edit Profile Information</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('editProfileModal').classList.remove('open')">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:1.4rem;">
+        <form id="editProfileForm" onsubmit="saveProfileChanges(event)">
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-user"></i> Full Name / Organization Title *</label>
+            <input type="text" id="editProfName" class="form-input" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-phone"></i> Contact Phone Number</label>
+            <input type="tel" id="editProfPhone" class="form-input" placeholder="+91 98765 43210">
+          </div>
+
+          <!-- Faculty Specific Block -->
+          <div id="profFacultyBlock" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;margin-bottom:1rem;">
+              <div>
+                <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-id-badge"></i> Designation</label>
+                <input type="text" id="editProfDesig" class="form-input" placeholder="e.g. Associate Professor">
+              </div>
+              <div>
+                <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-door-open"></i> Cabin / Office</label>
+                <input type="text" id="editProfOffice" class="form-input" placeholder="e.g. Room 204, Tech Block C">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:1rem;">
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-university"></i> Academic Department</label>
+              <input type="text" id="editProfDept" class="form-input" placeholder="e.g. Computer Science & Engineering">
+            </div>
+            <div class="form-group" style="margin-bottom:1rem;">
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-microchip"></i> Specialization / Research Focus</label>
+              <input type="text" id="editProfSpecialization" class="form-input" placeholder="e.g. Cloud Architecture & Edge AI">
+            </div>
+          </div>
+
+          <!-- Company Specific Block -->
+          <div id="profCompanyBlock" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;margin-bottom:1rem;">
+              <div>
+                <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-user-tie"></i> Contact Person</label>
+                <input type="text" id="editProfCompContact" class="form-input" placeholder="e.g. Rohan Mehra">
+              </div>
+              <div>
+                <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-industry"></i> Industry Sector</label>
+                <input type="text" id="editProfCompIndustry" class="form-input" placeholder="e.g. Software & Cloud Services">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:1rem;">
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-globe"></i> Corporate Website URL</label>
+              <input type="text" id="editProfCompWebsite" class="form-input" placeholder="https://techcorp.io">
+            </div>
+            <div class="form-group" style="margin-bottom:1rem;">
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-map-marker-alt"></i> Office Location / HQ</label>
+              <input type="text" id="editProfCompLocation" class="form-input" placeholder="e.g. Bangalore, India">
+            </div>
+          </div>
+
+          <!-- Admin Specific Block -->
+          <div id="profAdminBlock" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;margin-bottom:1rem;">
+              <div>
+                <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-id-badge"></i> Executive Designation</label>
+                <input type="text" id="editProfAdminDesig" class="form-input" placeholder="e.g. Dean of Academic Affairs">
+              </div>
+              <div>
+                <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-door-open"></i> Executive Office</label>
+                <input type="text" id="editProfAdminOffice" class="form-input" placeholder="e.g. Room 101, Main Admin Block">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:1rem;">
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-university"></i> Directorate / Division</label>
+              <input type="text" id="editProfAdminDept" class="form-input" placeholder="e.g. University Administration">
+            </div>
+          </div>
+
+          <!-- Student Specific Block -->
+          <div id="profStudentBlock" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;margin-bottom:1rem;">
+              <div>
+                <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-id-card"></i> Register Number</label>
+                <input type="text" id="editProfReg" class="form-input" placeholder="e.g. CC2023001">
+              </div>
+              <div>
+                <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-calendar-alt"></i> Year of Study</label>
+                <input type="text" id="editProfYear" class="form-input" placeholder="e.g. 3rd Year">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:1rem;">
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-graduation-cap"></i> Academic Department</label>
+              <input type="text" id="editProfStudentDept" class="form-input" placeholder="e.g. Computer Science & Engineering">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;margin-top:0.8rem;padding:0.75rem;"><i class="fas fa-save"></i> Save Profile Details</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-bottom" style="border-top:none;padding-top:0;">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <img src="assets/images/logo.png" alt="SCSVMV Logo" style="height:32px;width:auto;">
+          <div>&copy; 2026 EVENTS &bull; Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV). All rights reserved.</div>
+        </div>
+        <div style="display:flex;gap:1.5rem;">
+          <a href="index.html" style="color:#94A3B8;"><i class="fas fa-home"></i> Home</a>
+          <a href="events.html" style="color:#94A3B8;"><i class="fas fa-calendar-days"></i> Events</a>
+          <a href="verify-certificate.html" style="color:#94A3B8;"><i class="fas fa-certificate"></i> Verify Certificate</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── SCRIPT LOGIC ─── -->
+  <script>
+    let activeCertData = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Guard: Require Student or Active Auth
+      if (window.Auth && !window.Auth.requireAuth()) return;
+
+      const session = window.Auth.getSession();
+      loadUserProfile(session);
+      loadPasses(session);
+      loadCertificates(session);
+      loadWishlist(session);
+
+      // Check hash (e.g. #certificates)
+      if (window.location.hash === '#certificates') {
+        switchProfileTab('certificates');
+      }
+    });
+
+    function loadUserProfile(session) {
+      if (!session) return;
+      const role = (session.role || 'student').toLowerCase();
+      const roleBadge = document.getElementById('profileRoleBadge');
+      const avatarSlot = document.getElementById('profileAvatarSlot');
+      const nameEl = document.getElementById('profileName');
+      const subtextEl = document.getElementById('profileSubtext');
+
+      if (role === 'faculty') {
+        const name = session.name || 'Faculty Member';
+        nameEl.textContent = name;
+        roleBadge.textContent = 'FACULTY ORGANIZER';
+        roleBadge.className = 'role-badge faculty';
+        roleBadge.style.background = '#4169E1';
+        subtextEl.innerHTML = `<strong>${session.designation || 'Academic Faculty'}</strong> &bull; ${session.department || 'Computer Science & Engineering'} &bull; Office: ${session.office || session.cabin || 'Faculty Block Room 204'} &bull; ${session.email}`;
+        avatarSlot.textContent = name.charAt(0).toUpperCase();
+        avatarSlot.style.background = 'linear-gradient(135deg, #4169E1, #7957D5)';
+      } else if (role === 'company') {
+        const compName = session.company_name || session.name || 'Corporate Partner';
+        nameEl.textContent = compName;
+        roleBadge.textContent = 'CORPORATE PARTNER';
+        roleBadge.className = 'role-badge company';
+        roleBadge.style.background = '#10B981';
+        subtextEl.innerHTML = `<strong>${session.industry || 'Software & Cloud Services'}</strong> &bull; Coordinator: ${session.contact_person || session.name} &bull; <a href="${session.website || '#'}" target="_blank" style="color:#60A5FA">${session.website || 'Corporate Website'}</a> &bull; ${session.email}`;
+        avatarSlot.textContent = compName.charAt(0).toUpperCase();
+        avatarSlot.style.background = 'linear-gradient(135deg, #10B981, #047857)';
+      } else if (role === 'admin') {
+        const name = session.name || 'Platform Administrator';
+        nameEl.textContent = name;
+        roleBadge.textContent = 'SUPER ADMINISTRATOR';
+        roleBadge.className = 'role-badge admin';
+        roleBadge.style.background = '#EF4444';
+        subtextEl.innerHTML = `<strong>${session.designation || 'Dean of Academic Affairs'}</strong> &bull; ${session.department || 'University Administration'} &bull; Office: ${session.office || 'Main Admin Block'} &bull; ${session.email}`;
+        avatarSlot.textContent = name.charAt(0).toUpperCase();
+        avatarSlot.style.background = 'linear-gradient(135deg, #EF4444, #B91C1C)';
+      } else {
+        const name = session.name || 'Student Member';
+        nameEl.textContent = name;
+        roleBadge.textContent = 'STUDENT';
+        roleBadge.className = 'role-badge student';
+        subtextEl.textContent = `${session.department || 'Computer Science & Engineering'} ${session.reg_number ? '• Register No: ' + session.reg_number : ''} • Year ${session.year || '3'}`;
+        const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+        avatarSlot.textContent = initials || 'ST';
+        avatarSlot.style.background = 'linear-gradient(135deg, var(--secondary), var(--accent))';
+      }
+
+      const actionsSlot = document.getElementById('profileActionBtnsSlot');
+      if (actionsSlot) {
+        let portalBtn = '';
+        if (role === 'faculty') {
+          portalBtn = `<a href="faculty/dashboard.html" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.4)"><i class="fas fa-chalkboard-teacher"></i> Faculty Portal</a>`;
+        } else if (role === 'company') {
+          portalBtn = `<a href="company/dashboard.html" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.4)"><i class="fas fa-building"></i> Company Portal</a>`;
+        } else if (role === 'admin') {
+          portalBtn = `<a href="admin/dashboard.html" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.4)"><i class="fas fa-tachometer-alt"></i> Admin Console</a>`;
+        }
+        actionsSlot.innerHTML = `
+          ${portalBtn}
+          <a href="events.html" class="btn btn-primary"><i class="fas fa-compass"></i> Discover Events</a>
+          <button class="btn btn-secondary" onclick="openEditProfileModal()"><i class="fas fa-user-edit"></i> Edit Profile</button>
+        `;
+      }
+    }
+
+    function switchProfileTab(tab) {
+      document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tabContentPasses').style.display = tab === 'passes' ? 'block' : 'none';
+      document.getElementById('tabContentCertificates').style.display = tab === 'certificates' ? 'block' : 'none';
+      document.getElementById('tabContentWishlist').style.display = tab === 'wishlist' ? 'block' : 'none';
+
+      if (tab === 'passes') document.getElementById('tabPassesBtn').classList.add('active');
+      if (tab === 'certificates') document.getElementById('tabCertificatesBtn').classList.add('active');
+      if (tab === 'wishlist') document.getElementById('tabWishlistBtn').classList.add('active');
+    }
+
+    function loadPasses(session) {
+      const myRegs = window.DB.getAll('registrations').filter(r =>
+        r.user_id === session.userId || r.email.toLowerCase() === session.email.toLowerCase()
+      );
+
+      document.getElementById('statMyTicketsCount').textContent = myRegs.length;
+      const attended = myRegs.filter(r => r.attended).length;
+      document.getElementById('statAttendancePercent').textContent = myRegs.length > 0 ? `${Math.round((attended / myRegs.length) * 100)}%` : '0%';
+
+      const container = document.getElementById('passesContainerGrid');
+      if (myRegs.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;">
+            <div class="empty-state-icon"><i class="fas fa-ticket-alt"></i></div>
+            <div class="empty-state-title">No passes registered yet</div>
+            <div class="empty-state-desc">Explore upcoming conferences, hackathons, and placement drives to register.</div>
+            <a href="events.html" class="btn btn-primary btn-sm"><i class="fas fa-compass"></i> Explore Events</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = myRegs.map(reg => `
+        <div class="event-card" style="padding:1.4rem;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.8rem;">
+            <span class="status-badge ${reg.attended ? 'attended' : 'registered'}">
+              <i class="fas ${reg.attended ? 'fa-check-double' : 'fa-check'}"></i> ${reg.attended ? 'Checked In' : 'Confirmed Pass'}
+            </span>
+            <span style="font-family:monospace;font-size:0.8rem;font-weight:700;color:var(--secondary);background:var(--surface-alt);padding:0.2rem 0.5rem;border-radius:4px;">
+              ${reg.ticket_id}
+            </span>
+          </div>
+
+          <h3 style="font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:0.5rem;">${reg.event_title}</h3>
+          <div style="font-size:0.85rem;color:var(--text-muted);display:flex;flex-direction:column;gap:0.3rem;margin-bottom:1.2rem;">
+            <div><i class="fas fa-calendar-alt" style="color:var(--secondary);width:18px;"></i> ${formatDate(reg.event_date)} at ${formatTime(reg.event_time)}</div>
+            <div><i class="fas fa-map-marker-alt" style="color:var(--secondary);width:18px;"></i> ${reg.event_venue || 'University Hall'}</div>
+          </div>
+
+          <div style="display:flex;gap:0.5rem;">
+            <button class="btn btn-primary btn-sm" style="flex:1;" onclick="openQrPassModal('${reg.ticket_id}', '${reg.event_title.replace(/'/g, "\\'")}', '${formatDate(reg.event_date)}')">
+              <i class="fas fa-qrcode"></i> View QR Pass
+            </button>
+            <a href="event-details.html?id=${reg.event_id}" class="btn btn-secondary btn-sm"><i class="fas fa-external-link-alt"></i></a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadCertificates(session) {
+      const myCerts = window.DB.getAll('certificates').filter(c =>
+        c.recipient_email.toLowerCase() === session.email.toLowerCase() ||
+        (session.reg_number && c.reg_number === session.reg_number)
+      );
+
+      document.getElementById('statMyCertificatesCount').textContent = myCerts.length;
+      const container = document.getElementById('certificatesContainerGrid');
+
+      if (myCerts.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;">
+            <div class="empty-state-icon"><i class="fas fa-award"></i></div>
+            <div class="empty-state-title">No certificates issued yet</div>
+            <div class="empty-state-desc">Certificates are automatically generated once your event attendance is marked by an organizer.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = myCerts.map(cert => `
+        <div class="form-card" style="padding:1.6rem;text-align:center;">
+          <div style="width:54px;height:54px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:1.6rem;margin-bottom:0.8rem;">
+            <i class="fas fa-award"></i>
+          </div>
+          <h4 style="font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:0.3rem;">${cert.event_title}</h4>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:1rem;">Issued on ${formatDate(cert.issue_date)} &bull; ${cert.certificate_id}</p>
+          <div style="display:flex;gap:0.5rem;justify-content:center;">
+            <button class="btn btn-primary btn-sm" onclick="viewCertificate('${cert.certificate_id}')">
+              <i class="fas fa-eye"></i> View & Download
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadWishlist(session) {
+      const allEvents = window.DB.getAll('events');
+      const favEvents = allEvents.filter(e => window.DB.isFavorite(session.userId, e.id));
+      document.getElementById('statFavoritesCount').textContent = favEvents.length;
+
+      const container = document.getElementById('wishlistContainerGrid');
+      if (favEvents.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;">
+            <div class="empty-state-icon"><i class="fas fa-heart"></i></div>
+            <div class="empty-state-title">Your wishlist is empty</div>
+            <div class="empty-state-desc">Click the heart icon on any event card to save it for later review.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = favEvents.map(ev => `
+        <div class="event-card">
+          <div class="event-card-media" style="background-image:url('${ev.image_url}')">
+            <span class="event-badge-tag">${ev.category}</span>
+          </div>
+          <div class="event-card-content">
+            <h3 class="event-card-title">${ev.title}</h3>
+            <div class="event-meta-row" style="margin-bottom:1rem;"><i class="fas fa-calendar"></i> ${formatDate(ev.date)}</div>
+            <div class="event-card-footer">
+              <a href="event-details.html?id=${ev.id}" class="btn btn-secondary btn-sm" style="flex:1;"><i class="fas fa-info-circle"></i> Details</a>
+              <a href="register.html?event=${ev.id}" class="btn btn-primary btn-sm" style="flex:1;"><i class="fas fa-ticket-alt"></i> Register</a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openQrPassModal(ticketId, eventTitle, eventDate) {
+      document.getElementById('passModalEventTitle').textContent = eventTitle;
+      document.getElementById('passModalEventDate').textContent = eventDate;
+      document.getElementById('passModalTicketId').textContent = ticketId;
+
+      if (window.AttendanceSystem) {
+        window.AttendanceSystem.renderQRCode('modalQrCodeBox', ticketId, 180);
+      }
+      document.getElementById('qrTicketPassModal').classList.add('open');
+    }
+
+    function viewCertificate(certId) {
+      const cert = window.DB.getById('certificates', 'certificate_id', certId);
+      if (!cert) return;
+      activeCertData = cert;
+
+      const previewDiv = document.getElementById('certPreviewContainer');
+      previewDiv.innerHTML = `
+        <div class="certificate-preview-card">
+          <div class="cert-header-seal"><i class="fas fa-award"></i></div>
+          <div class="cert-title">EVENTS</div>
+          <div class="cert-sub">Smart Campus & Industry Certification &bull; Discover. Participate. Connect.</div>
+          <div style="font-size:0.95rem;font-style:italic;color:#64748B;margin:1rem 0;">This certificate is proudly awarded to</div>
+          <div class="cert-recipient-name">${cert.recipient_name}</div>
+          <div class="cert-text">
+            for verified attendance and active participation in <strong>"${cert.event_title}"</strong> on ${formatDate(cert.issue_date)}.
+          </div>
+          <div class="cert-footer-grid">
+            <div class="cert-id-badge">ID: ${cert.certificate_id}</div>
+            <div style="font-size:0.85rem;color:#101B3F;font-weight:700;">Verified University Credential</div>
+          </div>
+        </div>
+      `;
+      document.getElementById('certificateViewerModal').classList.add('open');
+    }
+
+    function printActiveCert() {
+      if (activeCertData && window.CertificateEngine) {
+        window.CertificateEngine.printCertificate(activeCertData);
+      }
+    }
+
+    function downloadActiveCert() {
+      if (activeCertData && window.CertificateEngine) {
+        window.CertificateEngine.downloadCertificate(activeCertData);
+      }
+    }
+
+    function openEditProfileModal() {
+      const session = window.Auth.getSession() || {};
+      const role = (session.role || 'student').toLowerCase();
+
+      document.getElementById('editProfName').value = session.company_name || session.name || '';
+      document.getElementById('editProfPhone').value = session.phone || '';
+
+      document.getElementById('profFacultyBlock').style.display = role === 'faculty' ? 'block' : 'none';
+      document.getElementById('profCompanyBlock').style.display = role === 'company' ? 'block' : 'none';
+      document.getElementById('profAdminBlock').style.display = role === 'admin' ? 'block' : 'none';
+      document.getElementById('profStudentBlock').style.display = (role !== 'faculty' && role !== 'company' && role !== 'admin') ? 'block' : 'none';
+
+      if (role === 'faculty') {
+        document.getElementById('editProfDesig').value = session.designation || 'Associate Professor';
+        document.getElementById('editProfDept').value = session.department || 'Computer Science & Engineering';
+        document.getElementById('editProfOffice').value = session.office || session.cabin || '';
+        document.getElementById('editProfSpecialization').value = session.specialization || session.research || '';
+      } else if (role === 'company') {
+        document.getElementById('editProfCompName').value = session.company_name || session.name || '';
+        document.getElementById('editProfCompContact').value = session.contact_person || session.contactPerson || session.name || '';
+        document.getElementById('editProfCompIndustry').value = session.industry || session.industrySector || 'Software & Cloud Services';
+        document.getElementById('editProfCompWebsite').value = session.website || session.corporateWebsite || '';
+        document.getElementById('editProfCompLocation').value = session.location || '';
+      } else if (role === 'admin') {
+        document.getElementById('editProfAdminDesig').value = session.designation || 'Dean of Academic Affairs';
+        document.getElementById('editProfAdminDept').value = session.department || 'University Administration';
+        document.getElementById('editProfAdminOffice').value = session.office || 'Room 101, Main Admin Block';
+      } else {
+        document.getElementById('editProfReg').value = session.reg_number || '';
+        document.getElementById('editProfStudentDept').value = session.department || 'Computer Science & Engineering';
+        document.getElementById('editProfYear').value = session.year || '3rd Year';
+      }
+
+      document.getElementById('editProfileModal').classList.add('open');
+    }
+
+    async function saveProfileChanges(e) {
+      e.preventDefault();
+      const session = window.Auth.getSession() || {};
+      const role = (session.role || 'student').toLowerCase();
+
+      const name = document.getElementById('editProfName').value.trim();
+      const phone = document.getElementById('editProfPhone').value.trim();
+
+      const updatedData = { name, phone };
+
+      if (role === 'faculty') {
+        updatedData.designation = document.getElementById('editProfDesig').value.trim();
+        updatedData.department = document.getElementById('editProfDept').value.trim();
+        updatedData.office = document.getElementById('editProfOffice').value.trim();
+        updatedData.cabin = document.getElementById('editProfOffice').value.trim();
+        updatedData.specialization = document.getElementById('editProfSpecialization').value.trim();
+      } else if (role === 'company') {
+        const compName = document.getElementById('editProfCompName').value.trim();
+        updatedData.name = compName;
+        updatedData.company_name = compName;
+        updatedData.companyName = compName;
+        updatedData.contact_person = document.getElementById('editProfCompContact').value.trim();
+        updatedData.contactPerson = document.getElementById('editProfCompContact').value.trim();
+        updatedData.industry = document.getElementById('editProfCompIndustry').value.trim();
+        updatedData.industrySector = document.getElementById('editProfCompIndustry').value.trim();
+        updatedData.website = document.getElementById('editProfCompWebsite').value.trim();
+        updatedData.corporateWebsite = document.getElementById('editProfCompWebsite').value.trim();
+        updatedData.location = document.getElementById('editProfCompLocation').value.trim();
+      } else if (role === 'admin') {
+        updatedData.designation = document.getElementById('editProfAdminDesig').value.trim();
+        updatedData.department = document.getElementById('editProfAdminDept').value.trim();
+        updatedData.office = document.getElementById('editProfAdminOffice').value.trim();
+      } else {
+        updatedData.reg_number = document.getElementById('editProfReg').value.trim();
+        updatedData.register_number = document.getElementById('editProfReg').value.trim();
+        updatedData.department = document.getElementById('editProfStudentDept').value.trim();
+        updatedData.year = document.getElementById('editProfYear').value.trim();
+      }
+
+      const res = await window.Auth.updateProfile(updatedData);
+      if (res && res.ok) {
+        showToast('Profile details updated successfully!', 'success');
+        document.getElementById('editProfileModal').classList.remove('open');
+        loadUserProfile(res.session);
+      } else {
+        alert(res.msg || 'Failed to update profile.');
+      }
+    }
+  </script>
+</body>
+</html>

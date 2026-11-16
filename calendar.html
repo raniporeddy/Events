@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVENTS | Interactive Event Calendar</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous">
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/chatbot.js"></script>
+  <style>
+    .calendar-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .calendar-header {
+      padding: 1.4rem 1.8rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: var(--surface-alt);
+    }
+    .calendar-nav-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .calendar-days-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: var(--surface-alt);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    .calendar-days-row div {
+      padding: 0.75rem 0.5rem;
+    }
+    .calendar-grid-cells {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+    .calendar-day-cell {
+      min-height: 110px;
+      padding: 0.6rem;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      background: var(--surface);
+      transition: background 0.15s;
+    }
+    .calendar-day-cell:nth-child(7n) {
+      border-right: none;
+    }
+    .calendar-day-cell.other-month {
+      background: var(--surface-alt);
+      opacity: 0.45;
+    }
+    .calendar-day-cell.today {
+      background: var(--secondary-light);
+    }
+    .day-num-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+    .calendar-day-cell.today .day-num-label {
+      color: var(--secondary);
+      font-weight: 900;
+    }
+    .calendar-event-pill {
+      font-size: 0.73rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      color: #ffffff;
+      transition: var(--transition);
+    }
+    .calendar-event-pill:hover {
+      transform: scale(1.02);
+      filter: brightness(1.1);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── HEADER ─── -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div>
+          <div class="brand-title">EVENTS</div>
+          <span class="brand-tagline-micro">SCSVMV Deemed to be University</span>
+        </div>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul id="mainNavList">
+          <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="events.html"><i class="fas fa-calendar-days"></i> Events</a></li>
+          <li><a href="calendar.html" class="active"><i class="fas fa-calendar"></i> Calendar</a></li>
+          <li><a href="verify-certificate.html"><i class="fas fa-certificate"></i> Verify Certificate</a></li>
+          <span id="headerRoleLinkSlot"></span>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+
+        <div class="notif-bell-wrap">
+          <button class="btn-bell" onclick="toggleNotifDropdown(event)">
+            <i class="fas fa-bell"></i>
+            <span class="notif-badge-pill" id="notifBadgePill" style="display:none;">0</span>
+          </button>
+          <div class="notif-dropdown-menu" id="notifDropdownMenu">
+            <div class="notif-menu-header">
+              <h4>Notifications</h4>
+              <span style="font-size:0.75rem;color:var(--secondary);font-weight:600;cursor:pointer;" onclick="toggleNotifDropdown(event)">Close</span>
+            </div>
+            <div class="notif-list-container" id="notifDropdownList"></div>
+          </div>
+        </div>
+
+        <div id="headerUserSlot"></div>
+
+        <button class="mobile-hamburger" onclick="document.querySelector('.desktop-nav').classList.toggle('open');">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── BANNER ─── -->
+  <section class="visual-page-hero" style="background-image:url('https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=1600&q=80')">
+    <div class="container">
+      <div style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.88rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#93C5FD;margin-bottom:1rem;text-shadow:0 2px 6px rgba(0,0,0,0.8)">
+        <i class="fas fa-calendar-check" style="color:#FBBF24"></i> Academic & Event Schedule
+      </div>
+      <h1 class="visual-page-hero-title">
+        Campus Event <span>Calendar</span>
+      </h1>
+      <p class="visual-page-hero-sub">
+        Interactive monthly schedule tracking all departmental symposiums, placement drives, cultural showcases, and robotics workshops.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─── MAIN CALENDAR ─── -->
+  <main class="container">
+    <div class="calendar-container">
+      <div class="calendar-header">
+        <div style="display:flex;align-items:center;gap:0.8rem;">
+          <h2 class="calendar-nav-title" id="calendarMonthTitle">May 2026</h2>
+          <button class="btn btn-secondary btn-sm" onclick="jumpToday()"><i class="fas fa-dot-circle"></i> Today</button>
+        </div>
+
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="prevMonth()"><i class="fas fa-chevron-left"></i> Prev</button>
+          <button class="btn btn-secondary btn-sm" onclick="nextMonth()">Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Days of Week Header -->
+      <div class="calendar-days-row">
+        <div>Sun</div>
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+      </div>
+
+      <!-- Days Grid Cells -->
+      <div class="calendar-grid-cells" id="calendarDaysGrid"></div>
+    </div>
+  </main>
+
+  <!-- ─── EVENT PREVIEW MODAL ─── -->
+  <div class="modal-overlay" id="eventPreviewModal">
+    <div class="modal-card" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="prevModalTitle"><i class="fas fa-calendar-alt text-secondary"></i> Event Details</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('eventPreviewModal').classList.remove('open')">&times;</button>
+      </div>
+      <div class="modal-body" id="prevModalBody"></div>
+      <div class="modal-footer">
+        <a href="#" class="btn btn-secondary btn-sm" id="prevModalDetailsLink"><i class="fas fa-info-circle"></i> View Full Page</a>
+        <a href="#" class="btn btn-primary btn-sm" id="prevModalRegLink"><i class="fas fa-ticket-alt"></i> Register Pass</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-bottom" style="border-top:none;padding-top:0;">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <img src="assets/images/logo.png" alt="SCSVMV Logo" style="height:32px;width:auto;">
+          <div>&copy; 2026 EVENTS &bull; Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV). All rights reserved.</div>
+        </div>
+        <div style="display:flex;gap:1.5rem;">
+          <a href="index.html" style="color:#94A3B8;"><i class="fas fa-home"></i> Home</a>
+          <a href="events.html" style="color:#94A3B8;"><i class="fas fa-calendar-days"></i> Events</a>
+          <a href="calendar.html" style="color:#94A3B8;"><i class="fas fa-calendar"></i> Calendar</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── CALENDAR SCRIPT ─── -->
+  <script>
+    let currentDate = new Date('2026-05-01'); // Synced with seed events
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCalendar(currentDate);
+    });
+
+    function renderCalendar(dateObj) {
+      const year = dateObj.getFullYear();
+      const month = dateObj.getMonth();
+
+      // Month Title
+      const monthName = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      document.getElementById('calendarMonthTitle').textContent = monthName;
+
+      const firstDayIndex = new Date(year, month, 1).getDay();
+      const lastDayDate = new Date(year, month + 1, 0).getDate();
+      const prevMonthLastDate = new Date(year, month, 0).getDate();
+
+      const grid = document.getElementById('calendarDaysGrid');
+      grid.innerHTML = '';
+
+      const allEvents = window.DB ? window.DB.getAll('events').filter(e => e.approval === 'approved') : [];
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      // Previous Month Trailing Days
+      for (let i = firstDayIndex; i > 0; i--) {
+        const dayNum = prevMonthLastDate - i + 1;
+        const cell = document.createElement('div');
+        cell.className = 'calendar-day-cell other-month';
+        cell.innerHTML = `<div class="day-num-label">${dayNum}</div>`;
+        grid.appendChild(cell);
+      }
+
+      // Current Month Days
+      for (let day = 1; day <= lastDayDate; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const isToday = dateStr === todayStr;
+
+        const cell = document.createElement('div');
+        cell.className = `calendar-day-cell ${isToday ? 'today' : ''}`;
+        cell.innerHTML = `<div class="day-num-label">${day}</div>`;
+
+        // Find events on this date
+        const dayEvents = allEvents.filter(e => e.date === dateStr);
+        dayEvents.forEach(ev => {
+          const catInfo = window.CampusConfig ? window.CampusConfig.getCategory(ev.category) : { color: '#4169E1' };
+          const pill = document.createElement('div');
+          pill.className = 'calendar-event-pill';
+          pill.style.background = catInfo.color;
+          pill.textContent = `${ev.time ? formatTime(ev.time) + ' ' : ''}${ev.title}`;
+          pill.title = `${ev.title} (${ev.venue})`;
+          pill.onclick = (e) => {
+            e.stopPropagation();
+            openEventPreview(ev);
+          };
+          cell.appendChild(pill);
+        });
+
+        grid.appendChild(cell);
+      }
+
+      // Next Month Leading Days
+      const totalCells = firstDayIndex + lastDayDate;
+      const nextDays = (7 - (totalCells % 7)) % 7;
+      for (let d = 1; d <= nextDays; d++) {
+        const cell = document.createElement('div');
+        cell.className = 'calendar-day-cell other-month';
+        cell.innerHTML = `<div class="day-num-label">${d}</div>`;
+        grid.appendChild(cell);
+      }
+    }
+
+    function prevMonth() {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar(currentDate);
+    }
+
+    function nextMonth() {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar(currentDate);
+    }
+
+    function jumpToday() {
+      currentDate = new Date();
+      renderCalendar(currentDate);
+    }
+
+    function openEventPreview(ev) {
+      document.getElementById('prevModalTitle').textContent = ev.title;
+      document.getElementById('prevModalBody').innerHTML = `
+        <div style="font-size:0.8rem;color:var(--secondary);font-weight:700;text-transform:uppercase;margin-bottom:0.4rem;">${ev.category}</div>
+        <div style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">${ev.description}</div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;font-size:0.88rem;color:var(--text);">
+          <div><i class="fas fa-calendar" style="color:var(--secondary);width:20px;"></i> <strong>Date:</strong> ${formatDate(ev.date)}</div>
+          <div><i class="fas fa-clock" style="color:var(--secondary);width:20px;"></i> <strong>Time:</strong> ${formatTime(ev.time)}</div>
+          <div><i class="fas fa-map-marker-alt" style="color:var(--secondary);width:20px;"></i> <strong>Venue:</strong> ${ev.venue}</div>
+          <div><i class="fas fa-user-tie" style="color:var(--secondary);width:20px;"></i> <strong>Organizer:</strong> ${ev.organizer_name}</div>
+        </div>
+      `;
+      document.getElementById('prevModalDetailsLink').href = `event-details.html?id=${ev.id}`;
+      document.getElementById('prevModalRegLink').href = `register.html?event=${ev.id}`;
+      document.getElementById('eventPreviewModal').classList.add('open');
+    }
+  </script>
+</body>
+</html>

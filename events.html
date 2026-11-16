@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVENTS | Discover Upcoming Campus & Industry Events</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous">
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/chatbot.js"></script>
+</head>
+<body>
+
+  <!-- ─── HEADER ─── -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div>
+          <div class="brand-title">EVENTS</div>
+          <span class="brand-tagline-micro">SCSVMV Deemed to be University</span>
+        </div>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul id="mainNavList">
+          <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="events.html" class="active"><i class="fas fa-calendar-days"></i> Events</a></li>
+          <li><a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a></li>
+          <li><a href="verify-certificate.html"><i class="fas fa-certificate"></i> Verify Certificate</a></li>
+          <span id="headerRoleLinkSlot"></span>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Notification Bell Dropdown -->
+        <div class="notif-bell-wrap">
+          <button class="btn-theme-toggle" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
+            <i class="fas fa-bell"></i>
+            <span class="notif-badge-pill" id="notifBadgePill" style="display:none">0</span>
+          </button>
+          <div class="notif-dropdown-menu" id="notifDropdownMenu">
+            <div class="notif-dropdown-header">
+              <span>Notifications</span>
+              <a href="notifications.html" style="font-size:0.75rem">View All</a>
+            </div>
+            <div class="notif-dropdown-list" id="notifDropdownList"></div>
+          </div>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+
+        <!-- User Profile Slot -->
+        <div id="headerUserSlot"></div>
+
+        <!-- Mobile Menu Button -->
+        <button class="mobile-hamburger" onclick="document.querySelector('.desktop-nav').classList.toggle('open');" aria-label="Toggle navigation menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── PAGE BANNER ─── -->
+  <section class="visual-page-hero" style="background-image:url('https://images.unsplash.com/photo-1511578314322-379afb476865?w=1600&q=80')">
+    <div class="container">
+      <div style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.88rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#93C5FD;margin-bottom:1rem;text-shadow:0 2px 6px rgba(0,0,0,0.8)">
+        <i class="fas fa-sparkles" style="color:#FBBF24"></i> Curated Campus Discovery
+      </div>
+      <h1 class="visual-page-hero-title">
+        Event <span>Catalog & Opportunities</span>
+      </h1>
+      <p class="visual-page-hero-sub">
+        Explore university-wide technical symposiums, research summits, hackathons, and certified career workshops across all departments.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <main class="container" style="padding-top:2rem">
+    <!-- Toolbar: Search & Filters -->
+    <div class="search-filter-toolbar">
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+        <div class="search-input-group">
+          <i class="fas fa-search"></i>
+          <input type="text" id="eventSearchInput" placeholder="Search by title, organizer, keywords, or department..." oninput="filterEvents()">
+        </div>
+
+        <select id="statusFilter" class="form-group" style="margin-bottom:0;width:auto;min-width:160px;padding:0.75rem 1rem;" onchange="filterEvents()">
+          <option value="all">All Statuses</option>
+          <option value="upcoming" selected>Upcoming Events</option>
+          <option value="completed">Completed Events</option>
+          <option value="ongoing">Ongoing</option>
+        </select>
+
+        <select id="departmentFilter" class="form-group" style="margin-bottom:0;width:auto;min-width:200px;padding:0.75rem 1rem;" onchange="filterEvents()">
+          <option value="all">All Departments</option>
+        </select>
+
+        <div style="display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface);">
+          <button id="viewGridBtn" class="btn btn-sm btn-primary" onclick="setViewMode('grid')" title="Grid View" style="border-radius:0;">
+            <i class="fas fa-th-large"></i>
+          </button>
+          <button id="viewListBtn" class="btn btn-sm btn-secondary" onclick="setViewMode('list')" title="List View" style="border-radius:0;">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Categories Scroll -->
+      <div class="category-chips-scroll" id="eventsCategoryChips"></div>
+    </div>
+
+    <!-- Active Filter Counter -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.4rem;flex-wrap:wrap;gap:0.75rem;">
+      <div style="font-size:0.92rem;color:var(--text-muted);">
+        Showing <strong id="eventsMatchCount" style="color:var(--text);">0</strong> events matching criteria
+      </div>
+      <div id="clearFiltersBtn" style="display:none;">
+        <button class="btn btn-secondary btn-sm" onclick="resetFilters()"><i class="fas fa-redo"></i> Reset Filters</button>
+      </div>
+    </div>
+
+    <!-- Events Container -->
+    <div class="events-grid" id="eventsCatalogGrid"></div>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="eventsEmptyState" style="display:none;">
+      <div class="empty-state-icon"><i class="fas fa-search"></i></div>
+      <div class="empty-state-title">No matching events found</div>
+      <div class="empty-state-desc">Try clearing your search query or selecting a different category filter.</div>
+      <button class="btn btn-primary btn-sm" onclick="resetFilters()"><i class="fas fa-undo"></i> Show All Events</button>
+    </div>
+
+    <!-- Visual Spotlight Banner -->
+    <div class="visual-cta-banner" style="background-image:url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80');margin:4rem 0 2rem;">
+      <div class="visual-cta-content">
+        <span class="campus-gallery-badge" style="margin-bottom:0.8rem"><i class="fas fa-certificate"></i> Digital Recognition</span>
+        <h2 style="font-size:2rem;font-weight:900;margin-bottom:0.8rem;color:#ffffff">Attend. Check In. Get Certified.</h2>
+        <p style="font-size:1rem;color:#CBD5E1;line-height:1.6;margin-bottom:1.5rem">Every attendee who checks in with their digital QR pass earns an authentic, tamper-proof participation certificate verified by SCSVMV University.</p>
+        <div style="display:flex;justify-content:center;gap:0.8rem;flex-wrap:wrap">
+          <a href="verify-certificate.html" class="btn btn-primary btn-sm"><i class="fas fa-award"></i> Certificate Verifier</a>
+          <a href="calendar.html" class="btn btn-outline btn-sm" style="color:#ffffff;border-color:rgba(255,255,255,0.4)"><i class="fas fa-calendar"></i> View Calendar</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.8rem">
+            <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-footer-logo">
+            <div>
+              <div class="brand-title" style="color:#ffffff">EVENTS</div>
+              <span class="brand-tagline-micro" style="color:#94A3B8">SCSVMV Deemed to be University</span>
+            </div>
+          </div>
+          <p class="footer-desc">
+            Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV) &bull; Smart Campus & Industry Event Management Platform connecting students, faculty, and corporate partners through curated opportunities.
+          </p>
+          <div style="display:flex;gap:0.75rem;margin-top:1.2rem;font-size:1.1rem">
+            <a href="#" style="color:#94A3B8"><i class="fab fa-linkedin"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-twitter"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-github"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fas fa-layer-group text-secondary"></i> Platform</h4>
+          <ul>
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="events.html"><i class="fas fa-calendar-alt"></i> Browse Events</a></li>
+            <li><a href="calendar.html"><i class="fas fa-calendar-day"></i> Event Calendar</a></li>
+            <li><a href="verify-certificate.html"><i class="fas fa-award"></i> Certificate Verification</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fas fa-user-shield text-secondary"></i> Portals</h4>
+          <ul>
+            <li><a href="profile.html"><i class="fas fa-user-graduate"></i> Student Profile</a></li>
+            <li><a href="faculty/dashboard.html"><i class="fas fa-chalkboard-teacher"></i> Faculty Console</a></li>
+            <li><a href="company/dashboard.html"><i class="fas fa-building"></i> Corporate Hub</a></li>
+            <li><a href="admin/dashboard.html"><i class="fas fa-shield-alt"></i> Administrator Command</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fas fa-headset text-secondary"></i> Contact & Support</h4>
+          <ul>
+            <li><i class="fas fa-envelope" style="margin-right:6px"></i> support@eventsplatform.edu</li>
+            <li><i class="fas fa-phone" style="margin-right:6px"></i> +91 (044) 2726-4300</li>
+            <li><i class="fas fa-map-marker-alt" style="margin-right:6px"></i> University Innovation Enclave</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 EVENTS &bull; Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV). All rights reserved.
+        </div>
+        <div style="font-style:italic;color:#94A3B8">
+          "Discover opportunities. Participate in experiences. Build your future."
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── SCRIPT LOGIC ─── -->
+  <script>
+    let activeCategory = 'all';
+    let currentViewMode = 'grid';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Populate Department Filter
+      const deptSelect = document.getElementById('departmentFilter');
+      if (deptSelect && window.CampusConfig) {
+        const depts = window.CampusConfig.get('departments') || [];
+        depts.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d;
+          opt.textContent = d;
+          deptSelect.appendChild(opt);
+        });
+      }
+
+      // 2. Populate Category Chips
+      const chipsContainer = document.getElementById('eventsCategoryChips');
+      if (chipsContainer && window.CampusConfig) {
+        const cats = window.CampusConfig.get('categories') || [];
+        chipsContainer.innerHTML = `
+          <button class="category-chip active" onclick="setCategoryFilter('all', this)">
+            <i class="fas fa-border-all"></i> All Categories
+          </button>
+        ` + cats.map(c => `
+          <button class="category-chip" data-category="${c.name}" onclick="setCategoryFilter('${c.name}', this)">
+            <i class="fas ${c.icon}" style="color:${c.color};"></i> ${c.name}
+          </button>
+        `).join('');
+      }
+
+      // Check URL parameters for category or search
+      const params = new URLSearchParams(window.location.search);
+      const urlCat = params.get('cat');
+      const urlSearch = params.get('search');
+
+      if (urlCat) {
+        activeCategory = urlCat;
+        setTimeout(() => {
+          const chip = document.querySelector(`.category-chip[data-category="${urlCat}"]`);
+          if (chip) {
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+          }
+          filterEvents();
+        }, 100);
+      } else if (urlSearch) {
+        document.getElementById('eventSearchInput').value = urlSearch;
+        filterEvents();
+      } else {
+        filterEvents();
+      }
+    });
+
+    function setCategoryFilter(cat, btn) {
+      activeCategory = cat;
+      document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      filterEvents();
+    }
+
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      const gridBtn = document.getElementById('viewGridBtn');
+      const listBtn = document.getElementById('viewListBtn');
+      const container = document.getElementById('eventsCatalogGrid');
+
+      if (mode === 'grid') {
+        gridBtn.className = 'btn btn-sm btn-primary';
+        listBtn.className = 'btn btn-sm btn-secondary';
+        container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(330px, 1fr))';
+      } else {
+        gridBtn.className = 'btn btn-sm btn-secondary';
+        listBtn.className = 'btn btn-sm btn-primary';
+        container.style.gridTemplateColumns = '1fr';
+      }
+      filterEvents();
+    }
+
+    function filterEvents() {
+      if (!window.DB) return;
+      const search = (document.getElementById('eventSearchInput').value || '').trim().toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const dept = document.getElementById('departmentFilter').value;
+
+      let events = window.DB.getAll('events').filter(e => e.approval === 'approved' || !e.approval);
+
+      if (activeCategory !== 'all') {
+        events = events.filter(e => (e.category || '').toLowerCase().includes(activeCategory.toLowerCase()) || activeCategory.toLowerCase().includes((e.category || '').toLowerCase()));
+      }
+
+      if (status !== 'all') {
+        events = events.filter(e => (e.status || '').toLowerCase() === status.toLowerCase());
+      }
+
+      if (dept !== 'all') {
+        events = events.filter(e => (e.department || '').toLowerCase() === dept.toLowerCase());
+      }
+
+      if (search) {
+        events = events.filter(e =>
+          (e.title || '').toLowerCase().includes(search) ||
+          (e.description || '').toLowerCase().includes(search) ||
+          (e.organizer_name || '').toLowerCase().includes(search) ||
+          (e.venue || '').toLowerCase().includes(search) ||
+          (e.tags || '').toLowerCase().includes(search)
+        );
+      }
+
+      document.getElementById('eventsMatchCount').textContent = events.length;
+      document.getElementById('clearFiltersBtn').style.display = (search || activeCategory !== 'all' || status !== 'upcoming' || dept !== 'all') ? 'block' : 'none';
+
+      renderEvents(events);
+    }
+
+    function resetFilters() {
+      document.getElementById('eventSearchInput').value = '';
+      document.getElementById('statusFilter').value = 'all';
+      document.getElementById('departmentFilter').value = 'all';
+      activeCategory = 'all';
+      document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+      document.querySelector('.category-chip').classList.add('active');
+      filterEvents();
+    }
+
+    function renderEvents(events) {
+      const grid = document.getElementById('eventsCatalogGrid');
+      const empty = document.getElementById('eventsEmptyState');
+
+      if (events.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      grid.innerHTML = events.map(ev => {
+        const current = Number(ev.registered_count || 0);
+        const max = Number(ev.max_participants || 100);
+        const pct = Math.min(100, Math.round((current / max) * 100));
+        const avail = Math.max(0, max - current);
+        const isFull = current >= max;
+        const isFav = window.DB ? window.DB.isFavorite(ev.id) : false;
+
+        return `
+          <div class="event-card">
+            <div class="event-card-media" style="background-image:url('${ev.image_url || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80'}')">
+              <span class="event-badge-tag"><i class="fas fa-tag"></i> ${ev.category}</span>
+              <span class="event-status-pill status-${isFull ? 'waitlist' : ev.status}">
+                <i class="fas ${isFull ? 'fa-hourglass-half' : 'fa-check-circle'}"></i> ${isFull ? 'Waitlist' : ev.status}
+              </span>
+              <button class="btn-wishlist event-bookmark-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${ev.id}', this, event)" title="Save to Favorites">
+                <i class="fas fa-bookmark"></i>
+              </button>
+            </div>
+            <div class="event-card-content">
+              <div class="event-card-category">${ev.department || 'University Activity'}</div>
+              <h3 class="event-card-title">${ev.title}</h3>
+
+              <div class="event-card-meta">
+                <div class="event-meta-row"><i class="fas fa-calendar-day"></i> <span>${formatDate(ev.date)}</span></div>
+                <div class="event-meta-row"><i class="fas fa-clock"></i> <span>${ev.time ? formatTime(ev.time) : '10:00 AM'}</span></div>
+                <div class="event-meta-row"><i class="fas fa-map-marker-alt"></i> <span>${ev.venue}</span></div>
+                <div class="event-meta-row"><i class="fas fa-user-tie"></i> <span>By ${ev.organizer_name}</span></div>
+              </div>
+
+              <div class="event-capacity-box">
+                <div class="capacity-meter-bar">
+                  <div class="capacity-meter-fill" style="width:${pct}%;${isFull ? 'background:#EC4899;' : ''}"></div>
+                </div>
+                <div class="capacity-meter-label">
+                  <span style="display:flex;align-items:center;gap:4px"><i class="fas fa-users text-secondary"></i> ${current} / ${max} Seats Filled (${pct}%)</span>
+                  <span style="color:${avail > 0 ? '#10B981' : '#EF4444'};font-weight:700">${avail > 0 ? avail + ' seats left' : 'Full'}</span>
+                </div>
+              </div>
+
+              <div class="event-card-footer">
+                <a href="event-details.html?id=${ev.id}" class="btn btn-secondary btn-sm" style="flex:1;"><i class="fas fa-info-circle"></i> View Details</a>
+                <a href="register.html?event=${ev.id}" class="btn btn-primary btn-sm" style="flex:1;${isFull ? 'background:#EC4899;' : ''}">
+                  <i class="fas ${isFull ? 'fa-hourglass-half' : 'fa-ticket-alt'}"></i> ${isFull ? 'Join Waitlist' : 'Get Pass'}
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleFav(eventId, btn, e) {
+      if (e) e.stopPropagation();
+      if (!window.DB) return;
+      const added = window.DB.toggleFavorite(eventId);
+      btn.classList.toggle('active', added);
+      if (window.showToast) {
+        window.showToast(added ? 'Added to Wishlist!' : 'Removed from Wishlist', 'info');
+      }
+    }
+  </script>
+</body>
+</html>

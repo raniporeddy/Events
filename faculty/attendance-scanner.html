@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Desk | EVENTS</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="../js/icons.js"></script>
+  <!-- HTML5-QRCode Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+  <!-- Global Top Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="../index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div class="logo-text">
+          <span class="logo-title">EVENTS</span>
+          <span class="logo-tagline">SCSVMV &bull; Attendance Scanner Desk</span>
+        </div>
+      </a>
+      
+      <div class="header-actions">
+        <a href="dashboard.html" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Faculty Console</a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+        <div class="header-user-menu" id="headerUserMenu"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-univ-badge">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo">
+        <span>SCSVMV Deemed to be University</span>
+      </div>
+      <div class="sidebar-user-card">
+        <div class="sidebar-user-avatar" id="scannerUserAvatar">S</div>
+        <div class="sidebar-user-meta">
+          <div class="sidebar-user-name" id="scannerUserName">Organizer Desk</div>
+          <div class="sidebar-user-role" id="scannerUserRole">Event Check-In</div>
+        </div>
+      </div>
+
+      <ul class="sidebar-menu-list">
+        <li class="sidebar-menu-heading">Attendance Hub</li>
+        <li><a href="attendance-scanner.html" class="sidebar-menu-link active"><i class="fas fa-qrcode"></i> Live QR Desk</a></li>
+        <li><a href="dashboard.html" class="sidebar-menu-link"><i class="fas fa-th-large"></i> Faculty Overview</a></li>
+        <li><a href="../create-event.html" class="sidebar-menu-link"><i class="fas fa-calendar-plus"></i> Propose Event</a></li>
+
+        <li class="sidebar-menu-heading">Reports</li>
+        <li><a href="../admin/attendance-reports.html" class="sidebar-menu-link"><i class="fas fa-chart-bar"></i> Attendance Reports</a></li>
+        <li><a href="../verify-certificate.html" class="sidebar-menu-link"><i class="fas fa-certificate"></i> Verify Certificate</a></li>
+
+        <li class="sidebar-menu-heading">Session Actions</li>
+        <li><a href="#" onclick="exportSessionLogCSV()" class="sidebar-menu-link"><i class="fas fa-file-csv"></i> Export Session Log</a></li>
+        <li><a href="#" onclick="clearSessionHistory()" class="sidebar-menu-link text-warning"><i class="fas fa-eraser"></i> Clear Session Log</a></li>
+        <li><a href="#" onclick="Auth.logout()" class="sidebar-menu-link text-danger"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <div style="position:relative;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);border:1px solid rgba(255,255,255,0.15);padding:2.2rem 2rem;color:#fff;background:url('https://images.unsplash.com/photo-1511578314322-379afb476865?w=1600&q=80') center/cover no-repeat;margin-bottom:2rem">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg, rgba(10,17,40,0.92) 0%, rgba(16,27,63,0.85) 50%, rgba(30,41,90,0.94) 100%);"></div>
+        <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem">
+          <div>
+            <span class="campus-gallery-badge" style="margin-bottom:0.6rem"><i class="fas fa-qrcode"></i> Venue Gate Operations</span>
+            <h1 style="font-family:'Montserrat',sans-serif;font-size:1.9rem;font-weight:900;color:#ffffff;margin-bottom:0.35rem">Live Attendance QR Desk</h1>
+            <p style="color:#CBD5E1;font-size:0.92rem;max-width:640px;line-height:1.5">Scan student event passes with your camera or enter registration ticket IDs directly.</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:1rem">
+            <div class="status-badge status-confirmed" style="font-size:0.9rem;padding:0.4rem 0.9rem;background:rgba(16,185,129,0.25);color:#34D399;border:1px solid rgba(52,211,153,0.4)">
+              <i class="fas fa-broadcast-tower"></i> Desk Active
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Selector Bar -->
+      <div class="dash-card" style="margin-bottom:1.5rem">
+        <div style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap">
+          <div style="flex:1;min-width:280px">
+            <label class="form-label" style="font-weight:700"><i class="fas fa-calendar-check text-secondary"></i> Select Event for Check-In:</label>
+            <select class="form-input" id="eventSelect" style="font-weight:600;color:var(--primary)">
+              <option value="">-- Choose an Event to Scan --</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:1rem;flex-wrap:wrap">
+            <div style="padding:0.6rem 1rem;background:var(--surface-alt);border-radius:var(--radius-sm);border:1px solid var(--border);text-align:center">
+              <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700"><i class="fas fa-user-check text-success"></i> Checked-in</div>
+              <div style="font-size:1.3rem;font-weight:800;color:var(--success)" id="statCheckedInCount">0</div>
+            </div>
+            <div style="padding:0.6rem 1rem;background:var(--surface-alt);border-radius:var(--radius-sm);border:1px solid var(--border);text-align:center">
+              <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700"><i class="fas fa-users text-primary"></i> Capacity</div>
+              <div style="font-size:1.3rem;font-weight:800;color:var(--primary)" id="statCapacityCount">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Scanner Desk Left Column -->
+        <div>
+          <!-- Scanner Camera Box -->
+          <div class="dash-card" style="margin-bottom:1.5rem">
+            <div class="dash-card-header">
+              <h3 class="dash-card-title"><i class="fas fa-camera text-secondary"></i> Camera Pass Reader</h3>
+              <button class="btn btn-ghost btn-xs" id="toggleCameraBtn" onclick="toggleCamera()"><i class="fas fa-video"></i> Start Camera</button>
+            </div>
+            <div id="qrReaderContainer" style="width:100%;min-height:260px;background:#101B3F;border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;overflow:hidden;position:relative">
+              <div id="scannerPlaceholder" style="text-align:center;padding:2rem">
+                <i class="fas fa-camera" style="font-size:3rem;margin-bottom:1rem;color:rgba(255,255,255,0.4)"></i>
+                <p style="font-size:0.9rem;color:rgba(255,255,255,0.8);margin-bottom:1rem">Camera feed paused or inactive.<br>Click below or enter Ticket ID manually.</p>
+                <button class="btn btn-secondary btn-sm" onclick="toggleCamera()"><i class="fas fa-play"></i> Activate Camera</button>
+              </div>
+              <div id="html5QrReader" style="width:100%"></div>
+            </div>
+          </div>
+
+          <!-- Manual Ticket Input Box -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h3 class="dash-card-title"><i class="fas fa-barcode text-primary"></i> Manual Ticket Entry / Barcode Gun</h3>
+            </div>
+            <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:1rem">
+              Supports handheld USB/Bluetooth barcode guns, copy-paste, or manual typing. Press <strong>Enter</strong> to submit.
+            </p>
+            <form id="manualScanForm" onsubmit="handleManualSubmit(event)" style="display:flex;gap:0.75rem">
+              <input type="text" class="form-input" id="ticketInput" placeholder="e.g. CC-TK-2026-1049" autofocus style="font-weight:700;letter-spacing:0.5px;font-size:1.05rem">
+              <button type="submit" class="btn btn-primary" style="white-space:nowrap"><i class="fas fa-check"></i> Check In</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Scan Feedback & History Right Column -->
+        <div>
+          <!-- Live Result Card -->
+          <div class="dash-card" id="resultCard" style="margin-bottom:1.5rem;min-height:160px;display:flex;flex-direction:column;justify-content:center;transition:all 0.25s ease">
+            <div id="resultContent" style="text-align:center;padding:1rem;color:var(--text-muted)">
+              <i class="fas fa-id-badge" style="font-size:2.8rem;margin-bottom:0.8rem;color:var(--border)"></i>
+              <h4 style="color:var(--text)">Awaiting First Scan</h4>
+              <p style="font-size:0.85rem">Scan a QR pass or type a ticket number to verify student enrollment and mark attendance.</p>
+            </div>
+          </div>
+
+          <!-- Session Scan History Table -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <div>
+                <h3 class="dash-card-title"><i class="fas fa-history text-secondary"></i> Session Scan Activity</h3>
+                <p class="dash-card-subtitle" id="sessionCounterText">0 passes processed this session</p>
+              </div>
+              <button class="btn btn-outline btn-xs" onclick="exportSessionLogCSV()"><i class="fas fa-file-csv"></i> Export Log</button>
+            </div>
+
+            <div class="table-wrap" style="max-height:300px;overflow-y:auto">
+              <table class="data-table" style="font-size:0.85rem">
+                <thead>
+                  <tr>
+                    <th><i class="fas fa-clock"></i> Time</th>
+                    <th><i class="fas fa-ticket-alt"></i> Ticket ID</th>
+                    <th><i class="fas fa-user-graduate"></i> Student Name</th>
+                    <th><i class="fas fa-info-circle"></i> Status</th>
+                  </tr>
+                </thead>
+                <tbody id="sessionHistoryBody">
+                  <tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No scans recorded in this browser session.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Audio Context Sound Synthesizer -->
+  <script>
+    function playBeep(isSuccess = true) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        if (isSuccess) {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(1200, audioCtx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.2);
+        } else {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(240, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(180, audioCtx.currentTime + 0.12);
+          gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.3);
+        }
+      } catch (e) {
+        // Audio synthesis fallback silently
+      }
+    }
+  </script>
+
+  <!-- Core Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/attendance.js"></script>
+  <script src="../js/script.js"></script>
+
+  <script>
+    let html5Scanner = null;
+    let cameraActive = false;
+    let sessionScans = [];
+    let selectedEventId = '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Auth.requireRole(['faculty', 'admin', 'company'], '../auth.html');
+      if (!user) return;
+
+      document.getElementById('scannerUserName').textContent = user.name || 'Organizer';
+      document.getElementById('scannerUserRole').textContent = (user.role || 'faculty').toUpperCase();
+      document.getElementById('scannerUserAvatar').textContent = (user.name || 'S').charAt(0).toUpperCase();
+
+      populateEventSelect();
+
+      // Check URL query param
+      const urlParams = new URLSearchParams(window.location.search);
+      const preselected = urlParams.get('eventId');
+      if (preselected) {
+        document.getElementById('eventSelect').value = preselected;
+        selectedEventId = preselected;
+        updateEventStats();
+      }
+
+      document.getElementById('eventSelect').addEventListener('change', (e) => {
+        selectedEventId = e.target.value;
+        updateEventStats();
+      });
+    });
+
+    function populateEventSelect() {
+      const select = document.getElementById('eventSelect');
+      const events = DB.getAll('events');
+      select.innerHTML = '<option value="">-- Choose an Event to Scan --</option>';
+
+      events.forEach(ev => {
+        const opt = document.createElement('option');
+        opt.value = ev.id;
+        opt.textContent = `[${ev.id}] ${ev.title} (${ev.date})`;
+        select.appendChild(opt);
+      });
+    }
+
+    function updateEventStats() {
+      if (!selectedEventId) {
+        document.getElementById('statCheckedInCount').textContent = '0';
+        document.getElementById('statCapacityCount').textContent = '0';
+        return;
+      }
+
+      const ev = DB.getById('events', selectedEventId);
+      const regs = DB.getAll('registrations').filter(r => r.event_id === selectedEventId);
+      const attended = regs.filter(r => r.attended).length;
+
+      document.getElementById('statCheckedInCount').textContent = attended;
+      document.getElementById('statCapacityCount').textContent = `${regs.length} / ${ev ? ev.max_participants : '?'}`;
+    }
+
+    function toggleCamera() {
+      if (cameraActive) {
+        stopCamera();
+      } else {
+        startCamera();
+      }
+    }
+
+    function startCamera() {
+      const placeholder = document.getElementById('scannerPlaceholder');
+      const btn = document.getElementById('toggleCameraBtn');
+
+      if (typeof Html5QrcodeScanner === 'undefined') {
+        Toast.show('Camera scanner library is loading or blocked by network. Please use manual entry.', 'warning');
+        return;
+      }
+
+      placeholder.style.display = 'none';
+      btn.innerHTML = '<i class="fas fa-stop"></i> Stop Camera';
+      btn.classList.add('text-danger');
+
+      html5Scanner = new Html5QrcodeScanner("html5QrReader", {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0,
+        showTorchButtonIfSupported: true
+      }, false);
+
+      html5Scanner.render((decodedText) => {
+        // Throttle repeated fast scans
+        if (decodedText) {
+          processTicketScanned(decodedText.trim());
+        }
+      }, (err) => {
+        // Frame scanning ignore
+      });
+
+      cameraActive = true;
+    }
+
+    function stopCamera() {
+      if (html5Scanner) {
+        html5Scanner.clear().catch(err => console.log(err));
+      }
+      document.getElementById('html5QrReader').innerHTML = '';
+      document.getElementById('scannerPlaceholder').style.display = 'block';
+      const btn = document.getElementById('toggleCameraBtn');
+      btn.innerHTML = '<i class="fas fa-video"></i> Start Camera';
+      btn.classList.remove('text-danger');
+      cameraActive = false;
+    }
+
+    function handleManualSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('ticketInput');
+      const val = input.value.trim();
+      if (!val) {
+        Toast.show('Please type or scan a Ticket ID.', 'warning');
+        return;
+      }
+      processTicketScanned(val);
+      input.value = '';
+      input.focus();
+    }
+
+    function processTicketScanned(ticketId) {
+      const user = Auth.getCurrentUser();
+      const scannedByName = user ? `${user.name} (${user.role})` : 'Organizer Desk';
+
+      // Check attendance in DB
+      const result = DB.markAttendanceByTicket(ticketId, scannedByName);
+      const resultCard = document.getElementById('resultCard');
+      const resultContent = document.getElementById('resultContent');
+
+      if (result.ok) {
+        playBeep(true);
+        resultCard.style.border = '2px solid var(--success)';
+        resultCard.style.background = 'rgba(16, 185, 129, 0.08)';
+
+        const reg = result.registration;
+        const certMsg = result.certificate_issued ? `<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--success)"><i class="fas fa-certificate"></i> Digital Certificate Issued: <strong>${result.certificate_id}</strong></div>` : '';
+
+        resultContent.innerHTML = `
+          <div style="font-size:2.4rem;color:var(--success);margin-bottom:0.5rem"><i class="fas fa-check-circle"></i></div>
+          <h3 style="color:var(--success);margin-bottom:0.3rem">Attendance Verified!</h3>
+          <div style="font-size:1.15rem;font-weight:700;color:var(--primary)">${reg.student_name || reg.name}</div>
+          <div style="font-size:0.88rem;color:var(--text-muted);margin-bottom:0.5rem">Reg No: <strong>${reg.register_number || 'N/A'}</strong> &bull; Dept: ${reg.department || 'Campus'}</div>
+          <div style="background:var(--surface);padding:0.6rem 1rem;border-radius:var(--radius-sm);border:1px solid var(--border);display:inline-block;text-align:left;font-size:0.82rem">
+            <div><strong>Event:</strong> ${reg.event_title}</div>
+            <div><strong>Ticket:</strong> <code>${reg.ticket_id}</code> &bull; Checked In: ${new Date().toLocaleTimeString()}</div>
+          </div>
+          ${certMsg}
+        `;
+
+        Toast.show(`Check-in successful: ${reg.student_name}`, 'success');
+
+        sessionScans.unshift({
+          time: new Date().toLocaleTimeString(),
+          ticket_id: reg.ticket_id,
+          student_name: reg.student_name,
+          status: 'Confirmed'
+        });
+      } else {
+        playBeep(false);
+        resultCard.style.border = '2px solid var(--danger)';
+        resultCard.style.background = 'rgba(239, 68, 68, 0.08)';
+
+        resultContent.innerHTML = `
+          <div style="font-size:2.4rem;color:var(--danger);margin-bottom:0.5rem"><i class="fas fa-exclamation-triangle"></i></div>
+          <h3 style="color:var(--danger);margin-bottom:0.3rem">Verification Notice</h3>
+          <p style="font-size:0.95rem;font-weight:600;color:var(--primary);margin-bottom:0.5rem">${result.msg}</p>
+          <div style="font-size:0.85rem;color:var(--text-muted)">Scanned Input: <code>${ticketId}</code></div>
+        `;
+
+        Toast.show(result.msg, 'warning');
+
+        sessionScans.unshift({
+          time: new Date().toLocaleTimeString(),
+          ticket_id: ticketId,
+          student_name: 'Unknown / Duplicate',
+          status: 'Rejected'
+        });
+      }
+
+      updateEventStats();
+      renderSessionHistory();
+    }
+
+    function renderSessionHistory() {
+      const tbody = document.getElementById('sessionHistoryBody');
+      document.getElementById('sessionCounterText').textContent = `${sessionScans.length} passes processed this session`;
+
+      if (!sessionScans.length) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No scans recorded in this browser session.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = sessionScans.map(s => `
+        <tr>
+          <td><span style="color:var(--text-muted)">${s.time}</span></td>
+          <td><code>${s.ticket_id}</code></td>
+          <td><strong>${s.student_name}</strong></td>
+          <td>
+            <span class="badge ${s.status === 'Confirmed' ? 'status-confirmed' : 'status-danger'}">
+              ${s.status}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function exportSessionLogCSV() {
+      if (!sessionScans.length) {
+        Toast.show('No scan records in session to export.', 'info');
+        return;
+      }
+      DB.downloadCSV('attendance_desk_session', sessionScans);
+    }
+
+    function clearSessionHistory() {
+      if (confirm('Clear the local session scan history list? This does not remove saved check-in records.')) {
+        sessionScans = [];
+        renderSessionHistory();
+      }
+    }
+  </script>
+</body>
+</html>

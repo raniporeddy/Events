@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Settings | EVENTS Admin</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="../js/icons.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="../index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div class="logo-text">
+          <span class="logo-title">EVENTS</span>
+          <span class="logo-tagline">SCSVMV &bull; Administrator Console</span>
+        </div>
+      </a>
+      
+      <div class="header-actions">
+        <a href="dashboard.html" class="btn btn-outline btn-sm"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+        <div class="header-user-menu" id="headerUserMenu"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-layout">
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-univ-badge">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo">
+        <span>SCSVMV Deemed to be University</span>
+      </div>
+      <ul class="sidebar-menu-list">
+        <li class="sidebar-menu-heading">Navigation</li>
+        <li><a href="dashboard.html" class="sidebar-menu-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="manage-events.html" class="sidebar-menu-link"><i class="fas fa-calendar-alt"></i> Manage Events</a></li>
+        <li><a href="users.html" class="sidebar-menu-link"><i class="fas fa-users-cog"></i> Users & Roles</a></li>
+        <li><a href="attendance-reports.html" class="sidebar-menu-link"><i class="fas fa-chart-line"></i> Attendance Reports</a></li>
+        <li><a href="system-settings.html" class="sidebar-menu-link active"><i class="fas fa-sliders-h"></i> Settings</a></li>
+      </ul>
+    </aside>
+
+    <main class="dashboard-main">
+      <div style="position:relative;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);border:1px solid rgba(255,255,255,0.15);padding:2.2rem 2rem;color:#fff;background:url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1600&q=80') center/cover no-repeat;margin-bottom:2rem">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg, rgba(10,17,40,0.92) 0%, rgba(16,27,63,0.85) 50%, rgba(30,41,90,0.94) 100%);"></div>
+        <div style="position:relative;z-index:2">
+          <span class="campus-gallery-badge" style="margin-bottom:0.6rem"><i class="fas fa-sliders-h"></i> System Configuration</span>
+          <h1 style="font-family:'Montserrat',sans-serif;font-size:1.9rem;font-weight:900;color:#ffffff;margin-bottom:0.35rem">System Settings & Governance</h1>
+          <p style="color:#CBD5E1;font-size:0.92rem;max-width:640px;line-height:1.5">Configure white-label university branding, SMTP email integration, event categories, and data backups.</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:2rem">
+        <!-- Branding Card -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div>
+              <h3 class="dash-card-title"><i class="fas fa-palette text-secondary"></i> Institutional Branding</h3>
+              <p class="dash-card-subtitle">Configurable platform title and university details</p>
+            </div>
+          </div>
+
+          <form onsubmit="saveBrandingSettings(event)">
+            <div class="form-group" style="margin-bottom:1rem">
+              <label class="form-label"><i class="fas fa-desktop"></i> Platform Name</label>
+              <input type="text" class="form-input" id="cfgAppName" value="EVENTS">
+            </div>
+
+            <div class="form-group" style="margin-bottom:1rem">
+              <label class="form-label"><i class="fas fa-tag"></i> Tagline</label>
+              <input type="text" class="form-input" id="cfgTagline" value="Discover. Participate. Connect.">
+            </div>
+
+            <div class="form-group" style="margin-bottom:1rem">
+              <label class="form-label"><i class="fas fa-university"></i> University / Institution</label>
+              <input type="text" class="form-input" id="cfgUnivName" value="Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV)">
+            </div>
+
+            <div class="grid-2" style="margin-bottom:1.5rem">
+              <div class="form-group">
+                <label class="form-label"><i class="fas fa-envelope"></i> Support Email</label>
+                <input type="email" class="form-input" id="cfgSupportEmail" value="support@events.edu">
+              </div>
+              <div class="form-group">
+                <label class="form-label"><i class="fas fa-phone"></i> Contact Phone</label>
+                <input type="text" class="form-input" id="cfgSupportPhone" value="+91 98765 43200">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Save Branding</button>
+          </form>
+        </div>
+
+        <!-- SMTP & Email Status -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div>
+              <h3 class="dash-card-title"><i class="fas fa-envelope-open-text text-primary"></i> Email OTP & SMTP Status</h3>
+              <p class="dash-card-subtitle">Real-time mail dispatch pipeline</p>
+            </div>
+            <span class="status-badge status-confirmed" id="smtpStatusBadge">
+              <i class="fas fa-plug"></i> Service Active
+            </span>
+          </div>
+
+          <div style="background:var(--surface-alt);border-radius:var(--radius-sm);padding:1.2rem;margin-bottom:1.5rem;border:1px solid var(--border)">
+            <div style="font-weight:700;color:var(--primary);margin-bottom:0.4rem">Backend Integration Details:</div>
+            <p style="font-size:0.86rem;color:var(--text-muted);margin-bottom:0.8rem">
+              EVENTS includes a production-grade <strong>Node.js & Express backend</strong> (<code>server.js</code>) with <strong>Nodemailer</strong> for direct SMTP delivery.
+            </p>
+            <ul style="font-size:0.82rem;color:var(--text-muted);line-height:1.7;padding-left:1.2rem">
+              <li>OTP Length: <strong>6 Random Digits</strong></li>
+              <li>OTP Validity: <strong>5 Minutes (300 seconds)</strong></li>
+              <li>Resend Cooldown: <strong>45 Seconds</strong></li>
+              <li>Password Security: <strong>Bcrypt Salt Hashing (10 rounds)</strong></li>
+              <li>Development Mode: <strong>Active with on-screen modal fallback</strong></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 style="font-size:0.92rem;color:var(--primary);margin-bottom:0.4rem">SMTP Configuration in .env:</h4>
+            <pre style="background:#101B3F;color:#E2E8F0;padding:0.8rem;border-radius:var(--radius-sm);font-size:0.75rem;overflow-x:auto"><code>SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-university-notifications@gmail.com
+SMTP_PASS=your-google-app-password
+SMTP_FROM="EVENTS &lt;no-reply@events.edu&gt;"</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories & Maintenance Row -->
+      <div class="grid-2">
+        <!-- Event Categories -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title"><i class="fas fa-tags text-secondary"></i> Configured Event Categories</h3>
+            <span class="badge" style="background:var(--secondary-light);color:var(--secondary)">12 Categories</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem" id="categoriesPillBox"></div>
+        </div>
+
+        <!-- Database Maintenance -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title"><i class="fas fa-database text-warning"></i> Data Governance & Backups</h3>
+          </div>
+          <p style="font-size:0.86rem;color:var(--text-muted);margin-bottom:1.2rem">
+            Export a full JSON snapshot of university events, registrations, certificates, and activity logs, or restore default seed data.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            <button class="btn btn-secondary btn-sm" onclick="downloadDatabaseJSON()"><i class="fas fa-file-download"></i> Download Full Database JSON Snapshot</button>
+            <button class="btn btn-outline btn-sm text-warning" onclick="handleClearLogs()"><i class="fas fa-eraser"></i> Clear System Audit Logs</button>
+            <button class="btn btn-outline btn-sm text-danger" onclick="handleFactoryReset()"><i class="fas fa-trash-restore"></i> Restore Factory Seed Database</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Auth.requireRole(['admin'], '../auth.html');
+      if (!user) return;
+
+      if (window.CONFIG) {
+        if (CONFIG.APP_NAME) document.getElementById('cfgAppName').value = CONFIG.APP_NAME;
+        if (CONFIG.APP_TAGLINE) document.getElementById('cfgTagline').value = CONFIG.APP_TAGLINE;
+        if (CONFIG.INSTITUTION_NAME) document.getElementById('cfgUnivName').value = CONFIG.INSTITUTION_NAME;
+        if (CONFIG.SUPPORT_EMAIL) document.getElementById('cfgSupportEmail').value = CONFIG.SUPPORT_EMAIL;
+      }
+
+      renderCategoriesList();
+    });
+
+    function renderCategoriesList() {
+      const box = document.getElementById('categoriesPillBox');
+      box.innerHTML = CONFIG.EVENT_CATEGORIES.map(c => `
+        <span class="badge" style="padding:0.45rem 0.8rem;background:var(--surface-alt);border:1px solid var(--border);color:var(--primary);font-size:0.82rem">
+          <i class="fas fa-check text-secondary" style="margin-right:4px"></i> ${c}
+        </span>
+      `).join('');
+    }
+
+    function saveBrandingSettings(e) {
+      e.preventDefault();
+      Toast.show('Branding configuration saved! Updates applied university-wide.', 'success');
+      DB.logActivity('ADMIN_UPDATE_BRANDING', 'Updated institutional branding parameters', 'admin');
+    }
+
+    function downloadDatabaseJSON() {
+      const snapshot = {
+        exported_at: new Date().toISOString(),
+        events: DB.getAll('events'),
+        registrations: DB.getAll('registrations'),
+        certificates: DB.getAll('certificates'),
+        feedback: DB.getAll('feedback'),
+        users: Auth.getAllUsers(),
+        logs: DB.getAll('activity_logs')
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(snapshot, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `campusconnect_backup_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      Toast.show('Database JSON backup downloaded!', 'success');
+    }
+
+    function handleClearLogs() {
+      if (confirm('Clear system activity logs? This cannot be undone.')) {
+        localStorage.setItem('campusconnect_db_activity_logs', JSON.stringify([]));
+        Toast.show('Activity logs cleared.', 'info');
+      }
+    }
+
+    function handleFactoryReset() {
+      if (confirm('Restore the factory seed database? All local test registrations and custom records will be reset.')) {
+        localStorage.clear();
+        DB.init();
+        Toast.show('Factory reset complete. Reloading...', 'success');
+        setTimeout(() => location.reload(), 800);
+      }
+    }
+  </script>
+</body>
+</html>

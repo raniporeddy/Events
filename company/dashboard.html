@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Portal | EVENTS</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="../js/icons.js"></script>
+</head>
+<body>
+  <!-- Global Top Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="../index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div class="logo-text">
+          <span class="logo-title">EVENTS</span>
+          <span class="logo-tagline">SCSVMV &bull; Corporate Partner Portal</span>
+        </div>
+      </a>
+      
+      <div class="header-actions">
+        <a href="post-event.html" class="btn btn-primary btn-sm"><i class="fas fa-plus-circle"></i> Post Campus Drive</a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+        <div class="header-user-menu" id="headerUserMenu"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-univ-badge">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo">
+        <span>SCSVMV Deemed to be University</span>
+      </div>
+      <div class="sidebar-user-card" id="companyUserCard">
+        <div class="sidebar-user-avatar" id="compAvatar" style="background:linear-gradient(135deg, #10B981, #047857)">C</div>
+        <div class="sidebar-user-meta">
+          <div class="sidebar-user-name" id="compName">TechCorp Solutions</div>
+          <div class="sidebar-user-role" id="compIndustry">Industry Partner</div>
+        </div>
+      </div>
+
+      <ul class="sidebar-menu-list">
+        <li class="sidebar-menu-heading">Corporate Hub</li>
+        <li><a href="dashboard.html" class="sidebar-menu-link active"><i class="fas fa-chart-line"></i> Company Overview</a></li>
+        <li><a href="post-event.html" class="sidebar-menu-link"><i class="fas fa-briefcase"></i> Post Drive / Seminar</a></li>
+
+        <li class="sidebar-menu-heading">Recruitment & Outreach</li>
+        <li><a href="../events.html?cat=Placement+Activities" class="sidebar-menu-link"><i class="fas fa-bullhorn"></i> Placement Drives</a></li>
+        <li><a href="../events.html?cat=Internship+Programs" class="sidebar-menu-link"><i class="fas fa-user-graduate"></i> Internship Sessions</a></li>
+        <li><a href="../calendar.html" class="sidebar-menu-link"><i class="fas fa-calendar-alt"></i> Campus Calendar</a></li>
+
+        <li class="sidebar-menu-heading">Account & Security</li>
+        <li><a href="../profile.html" class="sidebar-menu-link"><i class="fas fa-cog"></i> Company Profile</a></li>
+        <li><a href="#" onclick="Auth.logout()" class="sidebar-menu-link text-danger"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <div class="dashboard-page-header">
+        <div>
+          <h1 class="page-title"><i class="fas fa-building text-secondary"></i> Industry Partner Dashboard</h1>
+          <p class="page-subtitle">Manage campus recruitment drives, tech masterclasses, internship awareness programs, and applicant rosters.</p>
+        </div>
+        <div style="display:flex;gap:0.75rem">
+          <a href="post-event.html" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Submit Campus Event</a>
+        </div>
+      </div>
+
+      <!-- Company Profile Card Banner (Photographic Banner) -->
+      <div style="position:relative;margin-bottom:2rem;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);border:1px solid rgba(255,255,255,0.15);padding:2.2rem 2rem;color:#fff;background:url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1600&q=80') center/cover no-repeat;">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg, rgba(10,17,40,0.92) 0%, rgba(16,27,63,0.85) 50%, rgba(30,41,90,0.92) 100%);"></div>
+        <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem">
+          <div style="display:flex;align-items:center;gap:1.2rem">
+            <div style="font-size:2.8rem;color:#60A5FA;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))">
+              <i class="fas fa-landmark"></i>
+            </div>
+            <div>
+              <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap">
+                <h2 style="font-size:1.5rem;font-weight:900;color:#fff;margin:0" id="bannerCompName">TechCorp Solutions Inc.</h2>
+                <span style="color:#34D399;font-weight:700;font-size:0.85rem;display:inline-flex;align-items:center;gap:0.35rem;text-shadow:0 1px 4px rgba(0,0,0,0.8)">
+                  <i class="fas fa-check-circle"></i> Verified Corporate Partner &bull; SCSVMV Placement Cell
+                </span>
+              </div>
+              <div style="display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;margin-top:0.6rem;font-size:0.88rem;color:#CBD5E1">
+                <span><i class="fas fa-industry" style="color:#60A5FA;margin-right:4px"></i> Sector: <strong style="color:#fff" id="bannerCompIndustry">Software & Cloud Services</strong></span>
+                <span><i class="fas fa-user-tie" style="color:#60A5FA;margin-right:4px"></i> Contact Person: <span style="color:#fff" id="bannerCompContact">Rohan Mehra</span></span>
+                <span><i class="fas fa-envelope" style="color:#60A5FA;margin-right:4px"></i> <span id="bannerCompEmail">connect@techcorp.io</span></span>
+                <span><i class="fas fa-phone-alt" style="color:#60A5FA;margin-right:4px"></i> <span id="bannerCompPhone">+91 (Not Provided)</span></span>
+                <span><i class="fas fa-globe" style="color:#60A5FA;margin-right:4px"></i> <a href="#" id="compWebLink" style="color:#60A5FA;font-weight:600" target="_blank">visit corporate website</a></span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="openCompanyDetailsModal()"><i class="fas fa-edit"></i> Edit / Add Details</button>
+            <a href="post-event.html" class="btn btn-primary btn-sm"><i class="fas fa-paper-plane"></i> Propose Placement Drive</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Metrics -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap primary"><i class="fas fa-briefcase"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Hosted Campus Drives</span>
+            <span class="kpi-value" id="kpiCompDrives">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap info"><i class="fas fa-user-graduate"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Student Applicants</span>
+            <span class="kpi-value" id="kpiCompApplicants">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap success"><i class="fas fa-user-check"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Shortlisted / Attended</span>
+            <span class="kpi-value" id="kpiCompAttended">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap warning"><i class="fas fa-clock"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Pending University Approval</span>
+            <span class="kpi-value" id="kpiCompPending">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Company Events Table -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div>
+            <h3 class="dash-card-title"><i class="fas fa-calendar-check text-secondary"></i> Company Hosted Campus Events</h3>
+            <p class="dash-card-subtitle">Placement recruitment drives, technical workshops, and internship awareness programs</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-calendar-check"></i> Event Title</th>
+                <th><i class="fas fa-tag"></i> Category</th>
+                <th><i class="fas fa-clock"></i> Scheduled Date</th>
+                <th><i class="fas fa-map-marker-alt"></i> Venue / Mode</th>
+                <th><i class="fas fa-users"></i> Applicants</th>
+                <th><i class="fas fa-info-circle"></i> Status</th>
+                <th><i class="fas fa-shield-alt"></i> University Approval</th>
+                <th style="text-align:right"><i class="fas fa-cog"></i> Actions</th>
+              </tr>
+            </thead>
+            <tbody id="companyEventsTableBody">
+              <tr><td colspan="8" style="text-align:center;padding:2rem"><i class="fas fa-spinner fa-spin"></i> Loading company events...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recruitment Guidelines Box -->
+      <div class="dash-card" style="margin-top:2rem;background:var(--surface-alt)">
+        <h4 style="color:var(--primary);margin-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem">
+          <i class="fas fa-info-circle text-secondary"></i> Industry Collaboration Guidelines
+        </h4>
+        <ul style="font-size:0.88rem;color:var(--text-muted);display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:0.8rem;padding-left:1.2rem">
+          <li>All industry placement drives and seminars are reviewed by the University Placement Cell prior to publication.</li>
+          <li>Registered students receive unique digital passes with QR verification tokens for gate entry.</li>
+          <li>Recruiters can download the verified student applicant pool in CSV format for recruitment tracking.</li>
+          <li>For special recruitment requests or dedicated lab infrastructure, contact <strong>placement@events.edu</strong>.</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <!-- Applicant Roster Modal -->
+  <div class="modal-overlay" id="applicantModal">
+    <div class="modal-container" style="max-width:850px">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="applicantModalTitle">Candidate Applications</h3>
+          <p style="font-size:0.84rem;color:var(--text-muted)" id="applicantModalSubtitle">Students registered for this drive</p>
+        </div>
+        <button class="modal-close" onclick="closeApplicantModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;gap:1rem;flex-wrap:wrap">
+          <input type="text" class="form-input" id="applicantSearchInput" placeholder="Search applicant by name, roll no, or branch..." style="max-width:320px;padding:0.45rem 0.8rem;font-size:0.88rem">
+          <button class="btn btn-outline btn-sm" id="btnExportApplicantCSV"><i class="fas fa-file-csv"></i> Export Candidate CSV</button>
+        </div>
+        <div class="table-wrap" style="max-height:400px;overflow-y:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-ticket-alt"></i> Ticket / Roll No</th>
+                <th><i class="fas fa-user-graduate"></i> Candidate Name</th>
+                <th><i class="fas fa-envelope"></i> Email Address</th>
+                <th><i class="fas fa-graduation-cap"></i> Department</th>
+                <th><i class="fas fa-qrcode"></i> Check-in Status</th>
+              </tr>
+            </thead>
+            <tbody id="applicantTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline btn-sm" onclick="closeApplicantModal()"><i class="fas fa-times"></i> Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Company Details Edit Modal -->
+  <div class="modal-overlay" id="companyDetailsModal">
+    <div class="modal-card" style="max-width:540px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title"><i class="fas fa-building text-secondary"></i> Edit Corporate Details</h3>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin:0.25rem 0 0">Update company credentials, recruitment coordinator, website, and industry focus</p>
+        </div>
+        <button class="modal-close-btn" onclick="closeCompanyDetailsModal()">&times;</button>
+      </div>
+      <form id="companyDetailsForm" onsubmit="handleSaveCompanyDetails(event)">
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem;padding:1.4rem;">
+          <div>
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-building"></i> Company / Organization Name *</label>
+            <input type="text" id="compEditName" class="form-input" required placeholder="e.g. TechCorp Solutions Inc.">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.9rem">
+            <div>
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-user-tie"></i> Contact Person / Lead</label>
+              <input type="text" id="compEditContact" class="form-input" placeholder="e.g. Rohan Mehra">
+            </div>
+            <div>
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-phone"></i> Contact Phone</label>
+              <input type="tel" id="compEditPhone" class="form-input" placeholder="+91 98765 43212">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.9rem">
+            <div>
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-industry"></i> Industry Sector *</label>
+              <select id="compEditIndustry" class="form-input" required>
+                <option value="Software & Cloud Services">Software & Cloud Services</option>
+                <option value="Artificial Intelligence & Data">Artificial Intelligence & Data</option>
+                <option value="Information Security & Cyber Defense">Information Security & Cyber Defense</option>
+                <option value="Semiconductors & Embedded Systems">Semiconductors & Embedded Systems</option>
+                <option value="FinTech & Banking Solutions">FinTech & Banking Solutions</option>
+                <option value="Core Engineering & Manufacturing">Core Engineering & Manufacturing</option>
+                <option value="Consulting & Business Advisory">Consulting & Business Advisory</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-globe"></i> Corporate Website</label>
+              <input type="text" id="compEditWebsite" class="form-input" placeholder="https://techcorp.io">
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-map-marker-alt"></i> Headquarters / Regional Office Location</label>
+            <input type="text" id="compEditLocation" class="form-input" placeholder="e.g. Bangalore, India &bull; Silicon Valley, USA">
+          </div>
+          <div>
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-info-circle"></i> Corporate Overview / Hiring Focus</label>
+            <textarea id="compEditBio" class="form-input" rows="2" placeholder="Brief statement regarding university campus recruitment, internship programs, and hiring domains..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-sm" onclick="closeCompanyDetailsModal()"><i class="fas fa-times"></i> Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Save Details</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/script.js"></script>
+  <script>
+    let myCompEvents = [];
+    let currentApplicants = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Auth.requireRole(['company', 'admin'], '../auth.html');
+      if (!user) return;
+
+      renderCompanyProfile(user);
+      const compName = user.company_name || user.name || 'Corporate Partner';
+      loadCompanyData(compName, user.id);
+
+      document.getElementById('applicantSearchInput').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = currentApplicants.filter(a => 
+          (a.student_name && a.student_name.toLowerCase().includes(term)) ||
+          (a.register_number && a.register_number.toLowerCase().includes(term)) ||
+          (a.ticket_id && a.ticket_id.toLowerCase().includes(term)) ||
+          (a.department && a.department.toLowerCase().includes(term))
+        );
+        renderApplicantRows(filtered);
+      });
+    });
+
+    function loadCompanyData(companyName, userId) {
+      const allEvents = DB.getAll('events');
+      const allRegs = DB.getAll('registrations');
+
+      // Filter events created by this company
+      myCompEvents = allEvents.filter(e => {
+        if (Auth.getCurrentUser().role === 'admin') return true;
+        return e.organizer_type === 'company' && (e.company_name === companyName || e.organizer_id === userId || e.organizer_name === companyName);
+      });
+
+      const eventIds = myCompEvents.map(e => e.id);
+      const applicants = allRegs.filter(r => eventIds.includes(r.event_id));
+      const attended = applicants.filter(r => r.attended).length;
+      const pending = myCompEvents.filter(e => e.approval === 'pending').length;
+
+      document.getElementById('kpiCompDrives').textContent = myCompEvents.length;
+      document.getElementById('kpiCompApplicants').textContent = applicants.length;
+      document.getElementById('kpiCompAttended').textContent = attended;
+      document.getElementById('kpiCompPending').textContent = pending;
+
+      renderCompanyEvents();
+    }
+
+    function renderCompanyEvents() {
+      const tbody = document.getElementById('companyEventsTableBody');
+      if (!myCompEvents.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--text-muted)">
+          <i class="fas fa-briefcase" style="font-size:2.2rem;margin-bottom:0.5rem;display:block"></i>
+          No campus drives or sessions posted yet.<br>Click <strong>Post Campus Drive</strong> to submit a new recruitment or technical session for university approval.
+        </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = myCompEvents.map(ev => {
+        const approvalBadge = ev.approval === 'approved' 
+          ? '<span class="status-badge status-confirmed"><i class="fas fa-check-circle"></i> Approved</span>'
+          : (ev.approval === 'rejected' 
+            ? '<span class="status-badge status-danger"><i class="fas fa-times-circle"></i> Rejected</span>'
+            : '<span class="status-badge status-waitlist"><i class="fas fa-clock"></i> Pending University Review</span>');
+
+        const statusBadge = ev.status === 'upcoming'
+          ? '<span class="status-badge status-upcoming"><i class="fas fa-hourglass-start"></i> Upcoming</span>'
+          : '<span class="status-badge status-completed"><i class="fas fa-check-double"></i> Completed</span>';
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700;color:var(--primary);font-size:0.95rem">${ev.title}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted)">ID: ${ev.id} &bull; Target: ${ev.department || 'All Engineering & Tech'}</div>
+            </td>
+            <td><span class="badge" style="background:var(--secondary-light);color:var(--secondary);font-weight:600">${ev.category}</span></td>
+            <td>
+              <div style="font-weight:600;font-size:0.86rem">${ev.date}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted)">${ev.time || '10:00'} - ${ev.end_time || '17:00'}</div>
+            </td>
+            <td><div style="font-size:0.85rem">${ev.venue || 'Placement Auditorium'}</div></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.85rem">
+                <strong>${ev.registered_count || 0}</strong> / ${ev.max_participants || 100}
+              </div>
+              <div class="capacity-meter" style="height:4px;margin-top:4px"><div class="capacity-fill" style="width:${Math.min(100, Math.round(((ev.registered_count || 0)/(ev.max_participants || 100))*100))}%"></div></div>
+            </td>
+            <td>${statusBadge}</td>
+            <td>${approvalBadge}</td>
+            <td style="text-align:right;white-space:nowrap">
+              <button class="btn btn-secondary btn-xs" onclick="viewApplicants('${ev.id}')"><i class="fas fa-users"></i> Applicants (${ev.registered_count || 0})</button>
+              <a href="../event-details.html?id=${ev.id}" class="btn btn-ghost btn-xs" title="View Public Post"><i class="fas fa-external-link-alt"></i></a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function viewApplicants(eventId) {
+      const ev = DB.getById('events', eventId);
+      if (!ev) return;
+
+      document.getElementById('applicantModalTitle').textContent = `Candidates: ${ev.title}`;
+      document.getElementById('applicantModalSubtitle').textContent = `Date: ${ev.date} | Target: ${ev.department || 'All'} | Applications: ${ev.registered_count || 0}`;
+
+      const allRegs = DB.getAll('registrations');
+      currentApplicants = allRegs.filter(r => r.event_id === eventId);
+      renderApplicantRows(currentApplicants);
+
+      document.getElementById('btnExportApplicantCSV').onclick = () => {
+        DB.downloadCSV(`${ev.id}_candidates`, currentApplicants);
+      };
+
+      document.getElementById('applicantModal').classList.add('active');
+    }
+
+    function renderApplicantRows(list) {
+      const tbody = document.getElementById('applicantTableBody');
+      if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted)">No students have registered for this drive yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(a => `
+        <tr>
+          <td>
+            <code style="font-weight:700;color:var(--secondary)">${a.ticket_id}</code>
+            <div style="font-size:0.75rem;color:var(--text-muted)">Roll: ${a.register_number || 'N/A'}</div>
+          </td>
+          <td><strong>${a.student_name || a.name || 'Candidate'}</strong></td>
+          <td><span style="font-size:0.85rem;color:var(--text-muted)">${a.email || 'N/A'}</span></td>
+          <td>${a.department || 'Computer Science'}</td>
+          <td>
+            ${a.attended 
+              ? '<span class="badge status-confirmed"><i class="fas fa-check"></i> Present / Shortlisted</span>' 
+              : '<span class="badge" style="background:#e5e7eb;color:#4b5563"><i class="fas fa-clock"></i> Registered</span>'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function closeApplicantModal() {
+      document.getElementById('applicantModal').classList.remove('active');
+    }
+
+    function renderCompanyProfile(user) {
+      if (!user) user = Auth.getCurrentUser() || {};
+      const compName = user.company_name || user.companyName || user.name || 'TechCorp Solutions Inc.';
+      const industry = user.industry || user.industrySector || 'Software & Cloud Services';
+      const contact = user.contact_person || user.contactPerson || user.name || 'Lead Coordinator';
+      const email = user.email || 'connect@techcorp.io';
+      const phone = user.phone || '+91 98765 43212';
+      const website = user.website || user.corporateWebsite || 'https://techcorp.io';
+      const initial = compName.charAt(0).toUpperCase();
+
+      document.getElementById('compName').textContent = compName;
+      document.getElementById('bannerCompName').textContent = compName;
+      document.getElementById('compIndustry').textContent = industry;
+      document.getElementById('bannerCompIndustry').textContent = industry;
+      document.getElementById('bannerCompContact').textContent = contact;
+      document.getElementById('bannerCompEmail').textContent = email;
+      document.getElementById('bannerCompPhone').textContent = phone;
+      document.getElementById('compAvatar').textContent = initial;
+
+      const webEl = document.getElementById('compWebLink');
+      if (webEl) {
+        webEl.href = website.startsWith('http') ? website : `https://${website}`;
+        webEl.textContent = website.replace(/^https?:\/\//, '');
+      }
+    }
+
+    function openCompanyDetailsModal() {
+      const user = Auth.getCurrentUser() || {};
+      const compName = user.company_name || user.companyName || user.name || '';
+      document.getElementById('compEditName').value = compName;
+      document.getElementById('compEditContact').value = user.contact_person || user.contactPerson || user.name || '';
+      document.getElementById('compEditPhone').value = user.phone || '';
+      document.getElementById('compEditIndustry').value = user.industry || user.industrySector || 'Software & Cloud Services';
+      document.getElementById('compEditWebsite').value = user.website || user.corporateWebsite || '';
+      document.getElementById('compEditLocation').value = user.location || user.headquarters || '';
+      document.getElementById('compEditBio').value = user.bio || user.description || '';
+
+      document.getElementById('companyDetailsModal').classList.add('open');
+    }
+
+    function closeCompanyDetailsModal() {
+      document.getElementById('companyDetailsModal').classList.remove('open');
+    }
+
+    async function handleSaveCompanyDetails(e) {
+      e.preventDefault();
+      const updatedData = {
+        name: document.getElementById('compEditName').value.trim(),
+        company_name: document.getElementById('compEditName').value.trim(),
+        companyName: document.getElementById('compEditName').value.trim(),
+        contact_person: document.getElementById('compEditContact').value.trim(),
+        contactPerson: document.getElementById('compEditContact').value.trim(),
+        phone: document.getElementById('compEditPhone').value.trim(),
+        industry: document.getElementById('compEditIndustry').value.trim(),
+        industrySector: document.getElementById('compEditIndustry').value.trim(),
+        website: document.getElementById('compEditWebsite').value.trim(),
+        corporateWebsite: document.getElementById('compEditWebsite').value.trim(),
+        location: document.getElementById('compEditLocation').value.trim(),
+        bio: document.getElementById('compEditBio').value.trim(),
+        description: document.getElementById('compEditBio').value.trim()
+      };
+
+      const res = await Auth.updateProfile(updatedData);
+      if (res && res.ok) {
+        renderCompanyProfile(res.session);
+        loadCompanyData(res.session.company_name, res.session.userId);
+        closeCompanyDetailsModal();
+        if (window.Toast) Toast.show('Corporate details saved successfully!', 'success');
+        else alert('Corporate details saved successfully!');
+      } else {
+        alert(res.msg || 'Failed to update details.');
+      }
+    }
+  </script>
+</body>
+</html>

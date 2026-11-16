@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | EVENTS</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="../js/icons.js"></script>
+  <!-- Chart.js for SaaS analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="../index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div class="logo-text">
+          <span class="logo-title">EVENTS</span>
+          <span class="logo-tagline">SCSVMV &bull; Administrator Console</span>
+        </div>
+      </a>
+      
+      <div class="header-actions">
+        <a href="manage-events.html" class="btn btn-outline btn-sm"><i class="fas fa-calendar-alt"></i> Manage Events</a>
+        <a href="../create-event.html" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> New Event</a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+        <div class="header-user-menu" id="headerUserMenu"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-univ-badge">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo">
+        <span>SCSVMV Deemed to be University</span>
+      </div>
+      <div class="sidebar-user-card">
+        <div class="sidebar-user-avatar" style="background:linear-gradient(135deg, var(--danger), #B91C1C)">A</div>
+        <div class="sidebar-user-meta">
+          <div class="sidebar-user-name" id="adminUserName">Platform Admin</div>
+          <div class="sidebar-user-role">Super Administrator</div>
+        </div>
+      </div>
+
+      <ul class="sidebar-menu-list">
+        <li class="sidebar-menu-heading">Administrative Operations</li>
+        <li><a href="dashboard.html" class="sidebar-menu-link active"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</a></li>
+        <li><a href="manage-events.html" class="sidebar-menu-link"><i class="fas fa-calendar-alt"></i> Event Management</a></li>
+        <li><a href="users.html" class="sidebar-menu-link"><i class="fas fa-users-cog"></i> Users & Roles</a></li>
+        <li><a href="attendance-reports.html" class="sidebar-menu-link"><i class="fas fa-chart-line"></i> Attendance & Certs</a></li>
+        <li><a href="system-settings.html" class="sidebar-menu-link"><i class="fas fa-sliders-h"></i> Platform Settings</a></li>
+
+        <li class="sidebar-menu-heading">Portals Quick Access</li>
+        <li><a href="../faculty/dashboard.html" class="sidebar-menu-link"><i class="fas fa-chalkboard-teacher"></i> Faculty Portal</a></li>
+        <li><a href="../company/dashboard.html" class="sidebar-menu-link"><i class="fas fa-building"></i> Company Portal</a></li>
+        <li><a href="../faculty/attendance-scanner.html" class="sidebar-menu-link"><i class="fas fa-qrcode"></i> QR Scanner Desk</a></li>
+        <li><a href="../verify-certificate.html" class="sidebar-menu-link"><i class="fas fa-award"></i> Certificate Verifier</a></li>
+
+        <li class="sidebar-menu-heading">Data & Maintenance</li>
+        <li><a href="#" onclick="exportMasterCSV()" class="sidebar-menu-link"><i class="fas fa-file-csv"></i> Export Master CSV</a></li>
+        <li><a href="#" onclick="handleResetDatabase()" class="sidebar-menu-link text-warning"><i class="fas fa-undo"></i> Reset Sample Data</a></li>
+        <li><a href="#" onclick="Auth.logout()" class="sidebar-menu-link text-danger"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <div style="position:relative;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);border:1px solid rgba(255,255,255,0.15);padding:2.2rem 2rem;color:#fff;background:url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80') center/cover no-repeat;margin-bottom:2rem">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg, rgba(10,17,40,0.92) 0%, rgba(16,27,63,0.85) 50%, rgba(30,41,90,0.94) 100%);"></div>
+        <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem">
+          <div>
+            <span class="campus-gallery-badge" style="margin-bottom:0.6rem"><i class="fas fa-shield-alt"></i> Administrative Command Console</span>
+            <h1 style="font-family:'Montserrat',sans-serif;font-size:1.9rem;font-weight:900;color:#ffffff;margin-bottom:0.35rem">University Operations Command</h1>
+            <p style="color:#CBD5E1;font-size:0.92rem;max-width:680px;line-height:1.5">Real-time telemetry across academic departments, student registrations, industry drives, and system events.</p>
+            <div style="display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;margin-top:0.75rem;font-size:0.86rem;color:#CBD5E1">
+              <span><i class="fas fa-user-shield" style="color:#F59E0B"></i> Admin: <strong style="color:#fff" id="adminHeroName">Dr. S. K. Narayanan</strong></span>
+              <span><i class="fas fa-id-badge" style="color:#60A5FA"></i> Role: <span style="color:#fff" id="adminHeroDesig">Dean of Academic Affairs</span></span>
+              <span><i class="fas fa-university" style="color:#60A5FA"></i> Office: <span style="color:#fff" id="adminHeroDept">University Administration</span></span>
+              <span><i class="fas fa-envelope" style="color:#60A5FA"></i> <span id="adminHeroEmail">admin@events.edu</span></span>
+              <span><i class="fas fa-door-open" style="color:#60A5FA"></i> <span id="adminHeroOffice">Room 101, Admin Block</span></span>
+            </div>
+          </div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="openAdminDetailsModal()"><i class="fas fa-user-edit"></i> Edit Admin Details</button>
+            <button class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.3)" onclick="exportMasterCSV()"><i class="fas fa-download"></i> Export Data</button>
+            <a href="../create-event.html" class="btn btn-primary btn-sm"><i class="fas fa-plus-circle"></i> Add Campus Event</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- High-level KPI Row -->
+      <div class="kpi-grid" id="adminKpis">
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap primary"><i class="fas fa-calendar-alt"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Total Events</span>
+            <span class="kpi-value" id="statTotalEvents">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap warning"><i class="fas fa-hourglass-half"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Pending Approval</span>
+            <span class="kpi-value" id="statPendingApprovals">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap info"><i class="fas fa-user-check"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Total Registrations</span>
+            <span class="kpi-value" id="statTotalRegs">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap success"><i class="fas fa-percentage"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Attendance Rate</span>
+            <span class="kpi-value" id="statAttendanceRate">0%</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap accent"><i class="fas fa-user-graduate"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Active Students</span>
+            <span class="kpi-value" id="statStudents">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap primary"><i class="fas fa-building"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Corporate Partners</span>
+            <span class="kpi-value" id="statCompanies">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Approval Queue Section -->
+      <div class="dash-card" style="margin-bottom:2rem;border-left:4px solid var(--warning)">
+        <div class="dash-card-header">
+          <div>
+            <h3 class="dash-card-title"><i class="fas fa-clipboard-check text-warning"></i> Event Approval Queue</h3>
+            <p class="dash-card-subtitle">Pending submissions from faculty organizers and corporate industry partners</p>
+          </div>
+          <span class="badge status-waitlist" id="pendingQueueBadge">0 Pending</span>
+          <span class="badge status-waitlist" id="pendingQueueBadge">0 Pending</span>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-calendar-check"></i> Event Title & Organizer</th>
+                <th><i class="fas fa-tag"></i> Category</th>
+                <th><i class="fas fa-user-shield"></i> Organizer Type</th>
+                <th><i class="fas fa-clock"></i> Scheduled Date</th>
+                <th><i class="fas fa-map-marker-alt"></i> Venue / Capacity</th>
+                <th style="text-align:right"><i class="fas fa-cog"></i> Action</th>
+              </tr>
+            </thead>
+            <tbody id="pendingEventsBody">
+              <tr><td colspan="6" style="text-align:center;padding:2rem"><i class="fas fa-spinner fa-spin"></i> Checking pending requests...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Analytics Charts Section -->
+      <div class="grid-2" style="margin-bottom:2rem">
+        <!-- Category Distribution Chart -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div>
+              <h3 class="dash-card-title"><i class="fas fa-chart-pie text-secondary"></i> Category Distribution</h3>
+              <p class="dash-card-subtitle">Proportion of events across university categories</p>
+            </div>
+          </div>
+          <div style="height:280px;position:relative;display:flex;align-items:center;justify-content:center">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Department Participation Chart -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div>
+              <h3 class="dash-card-title"><i class="fas fa-chart-bar text-primary"></i> Department Participation</h3>
+              <p class="dash-card-subtitle">Student registrations by academic department</p>
+            </div>
+          </div>
+          <div style="height:280px;position:relative">
+            <canvas id="deptChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Registrations & Live System Activity -->
+      <div class="grid-2">
+        <!-- Recent Registrations -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title"><i class="fas fa-ticket-alt text-secondary"></i> Recent Registrations</h3>
+            <a href="attendance-reports.html" class="btn btn-ghost btn-xs"><i class="fas fa-arrow-right"></i> View All</a>
+          </div>
+          <div class="table-wrap" style="max-height:340px;overflow-y:auto">
+            <table class="data-table" style="font-size:0.85rem">
+              <thead>
+                <tr>
+                  <th><i class="fas fa-user-graduate"></i> Student</th>
+                  <th><i class="fas fa-calendar-alt"></i> Event</th>
+                  <th><i class="fas fa-ticket-alt"></i> Ticket</th>
+                  <th><i class="fas fa-info-circle"></i> Status</th>
+                </tr>
+              </thead>
+              <tbody id="recentRegsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- System Audit Log Feed -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title"><i class="fas fa-stream text-primary"></i> System Activity Logs</h3>
+            <span class="badge" style="background:var(--surface-alt)">Real-time Audit</span>
+          </div>
+          <div id="activityLogFeed" style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:0.75rem"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Admin Details Edit Modal -->
+  <div class="modal-overlay" id="adminDetailsModal">
+    <div class="modal-card" style="max-width:540px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title"><i class="fas fa-user-shield text-primary"></i> Edit Administrator Profile</h3>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin:0.25rem 0 0">Update executive credentials, designation, administrative directorate, and office details</p>
+        </div>
+        <button class="modal-close-btn" onclick="closeAdminDetailsModal()">&times;</button>
+      </div>
+      <form id="adminDetailsForm" onsubmit="handleSaveAdminDetails(event)">
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem;padding:1.4rem;">
+          <div>
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-user"></i> Full Administrator Name *</label>
+            <input type="text" id="adminEditName" class="form-input" required placeholder="e.g. Dr. S. K. Narayanan">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.9rem">
+            <div>
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-id-badge"></i> Executive Designation *</label>
+              <input type="text" id="adminEditDesig" class="form-input" required placeholder="e.g. Dean of Academic Affairs">
+            </div>
+            <div>
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-phone"></i> Official Phone</label>
+              <input type="tel" id="adminEditPhone" class="form-input" placeholder="+91 98765 43210">
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-university"></i> Directorate / Division *</label>
+            <input type="text" id="adminEditDept" class="form-input" required placeholder="e.g. University Administration & Student Affairs">
+          </div>
+          <div>
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-door-open"></i> Executive Office / Chamber</label>
+            <input type="text" id="adminEditOffice" class="form-input" placeholder="e.g. Main Administrative Block, Room 101">
+          </div>
+          <div>
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-comment-alt"></i> Administrative Focus / Directives</label>
+            <textarea id="adminEditBio" class="form-input" rows="2" placeholder="Institutional oversight notes or student welfare focus..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-sm" onclick="closeAdminDetailsModal()"><i class="fas fa-times"></i> Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Save Details</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/script.js"></script>
+  <script>
+    let categoryChartInstance = null;
+    let deptChartInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Role enforcement
+      const user = Auth.requireRole(['admin'], '../auth.html');
+      if (!user) return;
+
+      renderAdminProfile(user);
+      loadAdminOverview();
+    });
+
+    function loadAdminOverview() {
+      const stats = DB.getAnalytics();
+
+      document.getElementById('statTotalEvents').textContent = stats.totalEvents;
+      document.getElementById('statPendingApprovals').textContent = stats.pendingApprovals;
+      document.getElementById('statTotalRegs').textContent = stats.totalRegistrations;
+      document.getElementById('statAttendanceRate').textContent = `${stats.attendanceRate}%`;
+      document.getElementById('statStudents').textContent = stats.studentsCount;
+      document.getElementById('statCompanies').textContent = stats.companiesCount;
+      document.getElementById('pendingQueueBadge').textContent = `${stats.pendingApprovals} Pending`;
+
+      loadPendingApprovals();
+      renderCharts(stats);
+      renderRecentRegistrations();
+      renderActivityLogs();
+    }
+
+    function loadPendingApprovals() {
+      const pendingEvents = DB.getWhere('events', { approval: 'pending' });
+      const tbody = document.getElementById('pendingEventsBody');
+
+      if (!pendingEvents.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">
+          <i class="fas fa-check-circle" style="color:var(--success);font-size:1.6rem;margin-bottom:0.4rem;display:block"></i>
+          All event submissions have been reviewed! No pending requests.
+        </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = pendingEvents.map(ev => {
+        const typeBadge = ev.organizer_type === 'company' 
+          ? '<span class="badge" style="background:#dcfce7;color:#166534"><i class="fas fa-building"></i> Company</span>'
+          : '<span class="badge" style="background:#eff6ff;color:#1e40af"><i class="fas fa-chalkboard-teacher"></i> Faculty</span>';
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700;color:var(--primary)">${ev.title}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted)">Organizer: <strong>${ev.organizer_name}</strong> &bull; Dept: ${ev.department || 'N/A'}</div>
+            </td>
+            <td><span class="badge" style="background:var(--secondary-light);color:var(--secondary)">${ev.category}</span></td>
+            <td>${typeBadge}</td>
+            <td>
+              <div style="font-weight:600;font-size:0.85rem">${ev.date}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted)">${ev.time || '10:00'} - ${ev.end_time || '17:00'}</div>
+            </td>
+            <td>${ev.venue} (${ev.max_participants || 100} seats)</td>
+            <td style="text-align:right;white-space:nowrap">
+              <button class="btn btn-primary btn-xs" onclick="approveEvent('${ev.id}')"><i class="fas fa-check"></i> Approve</button>
+              <button class="btn btn-outline btn-xs text-danger" onclick="rejectEvent('${ev.id}')"><i class="fas fa-times"></i> Reject</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function approveEvent(eventId) {
+      const ev = DB.getById('events', eventId);
+      if (!ev) return;
+
+      DB.update('events', eventId, { approval: 'approved' });
+      DB.logActivity('ADMIN_APPROVE_EVENT', `Approved event '${ev.title}' (ID: ${eventId})`, 'admin');
+
+      // Notify organizer
+      DB.insertNotification({
+        title: 'Event Approved!',
+        message: `Your event "${ev.title}" has been approved by the administration and is now live on the public campus calendar.`,
+        type: 'event_approved',
+        recipient_role: ev.organizer_type || 'faculty',
+        event_id: eventId
+      });
+
+      Toast.show(`Approved "${ev.title}"!`, 'success');
+      loadAdminOverview();
+    }
+
+    function rejectEvent(eventId) {
+      const ev = DB.getById('events', eventId);
+      if (!ev) return;
+
+      const reason = prompt(`Enter reason for rejecting "${ev.title}":`, 'Incomplete schedule details or room conflict.');
+      if (reason === null) return;
+
+      DB.update('events', eventId, { approval: 'rejected', rejection_reason: reason });
+      DB.logActivity('ADMIN_REJECT_EVENT', `Rejected event '${ev.title}' (Reason: ${reason})`, 'admin');
+
+      DB.insertNotification({
+        title: 'Event Revision Requested',
+        message: `Your event "${ev.title}" was not approved: ${reason}`,
+        type: 'event_rejected',
+        recipient_role: ev.organizer_type || 'faculty',
+        event_id: eventId
+      });
+
+      Toast.show(`Rejected "${ev.title}"`, 'info');
+      loadAdminOverview();
+    }
+
+    function renderCharts(stats) {
+      if (typeof Chart === 'undefined') return;
+
+      // 1. Category Chart
+      const catCtx = document.getElementById('categoryChart').getContext('2d');
+      const catLabels = Object.keys(stats.catCounts || {});
+      const catData = Object.values(stats.catCounts || {});
+
+      const colors = ['#4169E1', '#7957D5', '#10B981', '#F59E0B', '#EF4444', '#06B6D4', '#EC4899', '#8B5CF6'];
+
+      if (categoryChartInstance) categoryChartInstance.destroy();
+      categoryChartInstance = new Chart(catCtx, {
+        type: 'doughnut',
+        data: {
+          labels: catLabels.length ? catLabels : ['No Data'],
+          datasets: [{
+            data: catData.length ? catData : [1],
+            backgroundColor: colors.slice(0, catLabels.length || 1),
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+          }
+        }
+      });
+
+      // 2. Department Chart
+      const deptCtx = document.getElementById('deptChart').getContext('2d');
+      const deptLabels = Object.keys(stats.deptCounts || {});
+      const deptData = Object.values(stats.deptCounts || {});
+
+      const displayLabels = deptLabels.length ? deptLabels.map(l => l.length > 18 ? l.slice(0, 16) + '...' : l) : ['No Data'];
+
+      if (deptChartInstance) deptChartInstance.destroy();
+      deptChartInstance = new Chart(deptCtx, {
+        type: 'bar',
+        data: {
+          labels: displayLabels,
+          datasets: [{
+            label: 'Registrations',
+            data: deptData.length ? deptData : [0],
+            backgroundColor: '#4169E1',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } },
+            x: { ticks: { font: { size: 10 } } }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    function renderRecentRegistrations() {
+      const regs = DB.getAll('registrations').slice(-8).reverse();
+      const tbody = document.getElementById('recentRegsBody');
+
+      if (!regs.length) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No registrations recorded yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = regs.map(r => `
+        <tr>
+          <td>
+            <div style="font-weight:700">${r.student_name || r.name}</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">${r.department || 'Campus'}</div>
+          </td>
+          <td><div style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.event_title}</div></td>
+          <td><code>${r.ticket_id}</code></td>
+          <td>
+            ${r.attended 
+              ? '<span class="badge status-confirmed"><i class="fas fa-check"></i> Attended</span>' 
+              : `<span class="badge ${r.status === 'waitlist' ? 'status-waitlist' : 'status-upcoming'}"><i class="fas fa-clock"></i> ${r.status}</span>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderActivityLogs() {
+      const logs = DB.getAll('activity_logs').slice(-8).reverse();
+      const feed = document.getElementById('activityLogFeed');
+
+      if (!logs.length) {
+        feed.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--text-muted)">No recent activity entries.</div>`;
+        return;
+      }
+
+      feed.innerHTML = logs.map(l => {
+        const timeAgo = l.timestamp ? new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'recently';
+        return `
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.6rem;background:var(--surface-alt);border-radius:var(--radius-sm);font-size:0.84rem">
+            <div style="color:var(--secondary);margin-top:2px"><i class="fas fa-dot-circle"></i></div>
+            <div style="flex:1">
+              <div style="color:var(--primary);font-weight:600">${l.details || l.action}</div>
+              <div style="font-size:0.72rem;color:var(--text-muted)">${l.action} &bull; ${timeAgo}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function exportMasterCSV() {
+      const events = DB.getAll('events');
+      DB.downloadCSV('campusconnect_master_events', events);
+    }
+
+    function handleResetDatabase() {
+      if (confirm('Are you sure you want to restore the default seed database? Any custom mock records will be reinitialized.')) {
+        localStorage.clear();
+        DB.init();
+        Toast.show('Database reinitialized to factory defaults!', 'success');
+        setTimeout(() => location.reload(), 800);
+      }
+    }
+
+    function renderAdminProfile(user) {
+      if (!user) user = Auth.getCurrentUser() || {};
+      const name = user.name || 'Dr. S. K. Narayanan';
+      const desig = user.designation || 'Dean of Academic Affairs';
+      const dept = user.department || 'University Administration';
+      const email = user.email || 'admin@events.edu';
+      const office = user.office || user.cabin || 'Room 101, Main Admin Block';
+      const initial = name.charAt(0).toUpperCase();
+
+      document.getElementById('adminUserName').textContent = name;
+      document.getElementById('adminHeroName').textContent = name;
+      document.getElementById('adminHeroDesig').textContent = desig;
+      document.getElementById('adminHeroDept').textContent = dept;
+      document.getElementById('adminHeroEmail').textContent = email;
+      document.getElementById('adminHeroOffice').textContent = office;
+    }
+
+    function openAdminDetailsModal() {
+      const user = Auth.getCurrentUser() || {};
+      document.getElementById('adminEditName').value = user.name || '';
+      document.getElementById('adminEditDesig').value = user.designation || 'Dean of Academic Affairs';
+      document.getElementById('adminEditDept').value = user.department || 'University Administration';
+      document.getElementById('adminEditPhone').value = user.phone || '';
+      document.getElementById('adminEditOffice').value = user.office || user.cabin || '';
+      document.getElementById('adminEditBio').value = user.bio || '';
+
+      document.getElementById('adminDetailsModal').classList.add('open');
+    }
+
+    function closeAdminDetailsModal() {
+      document.getElementById('adminDetailsModal').classList.remove('open');
+    }
+
+    async function handleSaveAdminDetails(e) {
+      e.preventDefault();
+      const updatedData = {
+        name: document.getElementById('adminEditName').value.trim(),
+        designation: document.getElementById('adminEditDesig').value.trim(),
+        department: document.getElementById('adminEditDept').value.trim(),
+        phone: document.getElementById('adminEditPhone').value.trim(),
+        office: document.getElementById('adminEditOffice').value.trim(),
+        cabin: document.getElementById('adminEditOffice').value.trim(),
+        bio: document.getElementById('adminEditBio').value.trim()
+      };
+
+      const res = await Auth.updateProfile(updatedData);
+      if (res && res.ok) {
+        renderAdminProfile(res.session);
+        closeAdminDetailsModal();
+        if (window.Toast) Toast.show('Administrator details updated successfully!', 'success');
+        else alert('Administrator details updated successfully!');
+      } else {
+        alert(res.msg || 'Failed to update details.');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVENTS | Notification Center</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/chatbot.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div>
+          <div class="brand-title">EVENTS</div>
+          <span class="brand-tagline-micro">SCSVMV Deemed to be University</span>
+        </div>
+      </a>
+      
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul id="mainNavList">
+          <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="events.html"><i class="fas fa-calendar-days"></i> Events</a></li>
+          <li><a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a></li>
+          <li><a href="verify-certificate.html"><i class="fas fa-certificate"></i> Verify Certificate</a></li>
+          <span id="headerRoleLinkSlot"></span>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+        <div id="headerUserSlot"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── VISUAL PAGE HERO ─── -->
+  <section class="visual-page-hero" style="background-image:url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1600&q=80')">
+    <div class="container">
+      <div style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.88rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#93C5FD;margin-bottom:1rem;text-shadow:0 2px 6px rgba(0,0,0,0.8)">
+        <i class="fas fa-bell" style="color:#FBBF24"></i> Live Alerts & Telemetry
+      </div>
+      <h1 class="visual-page-hero-title">
+        Notification <span>Center</span>
+      </h1>
+      <p class="visual-page-hero-sub">
+        Real-time alerts, event registration confirmations, waitlist updates, and credential issuance notices.
+      </p>
+    </div>
+  </section>
+
+  <div class="page-container" style="max-width:900px;margin:2.5rem auto;padding:0 1.2rem">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
+      <button class="btn btn-outline btn-sm" onclick="markAllNotificationsAsRead()"><i class="fas fa-check-double"></i> Mark All as Read</button>
+    </div>
+
+    <!-- Notification Filter Tabs -->
+    <div class="dash-card" style="margin-bottom:1.5rem;padding:0.75rem 1rem">
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+        <button class="chip active" onclick="setNotifFilter('all', this)"><i class="fas fa-list"></i> All Notifications</button>
+        <button class="chip" onclick="setNotifFilter('unread', this)"><i class="fas fa-envelope"></i> Unread</button>
+        <button class="chip" onclick="setNotifFilter('event_approval', this)"><i class="fas fa-check-circle"></i> Approvals</button>
+        <button class="chip" onclick="setNotifFilter('registration', this)"><i class="fas fa-ticket-alt"></i> Registrations</button>
+        <button class="chip" onclick="setNotifFilter('certificate', this)"><i class="fas fa-award"></i> Certificates</button>
+      </div>
+    </div>
+
+    <!-- Notifications List -->
+    <div id="notificationsContainer" style="display:flex;flex-direction:column;gap:1rem;margin-bottom:2.5rem">
+      <div class="dash-card" style="text-align:center;padding:2rem"><i class="fas fa-spinner fa-spin"></i> Loading alerts...</div>
+    </div>
+
+    <!-- Communication Preferences Box -->
+    <div class="dash-card" style="background:var(--surface-alt)">
+      <div class="dash-card-header">
+        <div>
+          <h3 class="dash-card-title"><i class="fas fa-envelope-open-text text-primary"></i> Multi-Channel Notification Preferences</h3>
+          <p class="dash-card-subtitle">Manage how you receive alerts and event passes</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:1.2rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0.9rem;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border)">
+          <div>
+            <div style="font-weight:700;font-size:0.92rem;color:var(--primary)"><i class="fas fa-envelope text-secondary"></i> Email OTP & Passes</div>
+            <div style="font-size:0.78rem;color:var(--text-muted)">Send registration tickets to email</div>
+          </div>
+          <input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--secondary)">
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0.9rem;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border)">
+          <div>
+            <div style="font-weight:700;font-size:0.92rem;color:var(--primary)"><i class="fas fa-calendar-alt text-secondary"></i> Calendar Reminders</div>
+            <div style="font-size:0.78rem;color:var(--text-muted)">24hr prior to scheduled event</div>
+          </div>
+          <input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--secondary)">
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0.9rem;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border)">
+          <div>
+            <div style="font-weight:700;font-size:0.92rem;color:var(--primary)"><i class="fas fa-award text-secondary"></i> Digital Certificates</div>
+            <div style="font-size:0.78rem;color:var(--text-muted)">Notify when certificate unlocks</div>
+          </div>
+          <input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--secondary)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.8rem">
+            <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-footer-logo">
+            <div>
+              <div class="brand-title" style="color:#ffffff">EVENTS</div>
+              <span class="brand-tagline-micro" style="color:#94A3B8">SCSVMV Deemed to be University</span>
+            </div>
+          </div>
+          <p class="footer-desc">
+            Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV) &bull; Smart Campus & Industry Event Management Platform connecting students, faculty, and corporate partners through curated opportunities.
+          </p>
+          <div style="display:flex;gap:0.75rem;margin-top:1.2rem;font-size:1.1rem">
+            <a href="#" style="color:#94A3B8"><i class="fab fa-linkedin"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-twitter"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-github"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fas fa-layer-group text-secondary"></i> Platform</h4>
+          <ul>
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="events.html"><i class="fas fa-calendar-alt"></i> Browse Events</a></li>
+            <li><a href="calendar.html"><i class="fas fa-calendar-day"></i> Event Calendar</a></li>
+            <li><a href="verify-certificate.html"><i class="fas fa-award"></i> Certificate Verification</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fas fa-user-shield text-secondary"></i> Portals</h4>
+          <ul>
+            <li><a href="profile.html"><i class="fas fa-user-graduate"></i> Student Profile</a></li>
+            <li><a href="faculty/dashboard.html"><i class="fas fa-chalkboard-teacher"></i> Faculty Console</a></li>
+            <li><a href="company/dashboard.html"><i class="fas fa-building"></i> Corporate Hub</a></li>
+            <li><a href="admin/dashboard.html"><i class="fas fa-shield-alt"></i> Administrator Command</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4><i class="fas fa-headset text-secondary"></i> Contact & Support</h4>
+          <ul>
+            <li><i class="fas fa-envelope" style="margin-right:6px"></i> support@eventsplatform.edu</li>
+            <li><i class="fas fa-phone" style="margin-right:6px"></i> +91 (044) 2726-4300</li>
+            <li><i class="fas fa-map-marker-alt" style="margin-right:6px"></i> University Innovation Enclave</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 EVENTS &bull; Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV). All rights reserved.
+        </div>
+        <div style="font-style:italic;color:#94A3B8">
+          "Discover opportunities. Participate in experiences. Build your future."
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    let activeFilter = 'all';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderNotifications();
+    });
+
+    function setNotifFilter(type, btn) {
+      activeFilter = type;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderNotifications();
+    }
+
+    function renderNotifications() {
+      const container = document.getElementById('notificationsContainer');
+      const allNotifs = DB.getAll('notifications');
+
+      let filtered = allNotifs;
+      if (activeFilter === 'unread') {
+        filtered = filtered.filter(n => !n.read);
+      } else if (activeFilter !== 'all') {
+        filtered = filtered.filter(n => n.type === activeFilter);
+      }
+
+      if (!filtered.length) {
+        container.innerHTML = `
+          <div class="dash-card" style="text-align:center;padding:3rem;color:var(--text-muted)">
+            <i class="fas fa-bell-slash" style="font-size:2.4rem;margin-bottom:0.8rem;display:block"></i>
+            No notifications in this category. You are all caught up!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(n => {
+        let icon = '<i class="fas fa-bell"></i>';
+        let iconBg = 'var(--secondary)';
+        if (n.type === 'event_approval' || n.type === 'event_approved') {
+          icon = '<i class="fas fa-check-circle"></i>';
+          iconBg = 'var(--success)';
+        } else if (n.type === 'certificate') {
+          icon = '<i class="fas fa-award"></i>';
+          iconBg = 'var(--accent)';
+        } else if (n.type === 'registration') {
+          icon = '<i class="fas fa-ticket-alt"></i>';
+          iconBg = 'var(--secondary)';
+        }
+
+        const timeStr = n.timestamp ? new Date(n.timestamp).toLocaleDateString() + ' ' + new Date(n.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Recent';
+
+        return `
+          <div class="dash-card" style="display:flex;align-items:flex-start;gap:1.2rem;padding:1.2rem;border-left:4px solid ${n.read ? 'transparent' : 'var(--secondary)'}">
+            <div style="width:44px;height:44px;border-radius:12px;background:${iconBg};color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">
+              ${icon}
+            </div>
+            <div style="flex:1">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.3rem">
+                <h4 style="font-size:1rem;font-weight:700;color:var(--primary);margin:0">${n.title}</h4>
+                <span style="font-size:0.75rem;color:var(--text-muted)">${timeStr}</span>
+              </div>
+              <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.5;margin-bottom:0.5rem">${n.message}</p>
+              ${n.event_id ? `
+                <a href="event-details.html?id=${n.event_id}" class="btn btn-ghost btn-xs" style="padding:2px 8px;font-size:0.78rem">
+                  View Event Details <i class="fas fa-arrow-right" style="margin-left:4px"></i>
+                </a>
+              ` : ''}
+            </div>
+            ${!n.read ? '<span style="width:8px;height:8px;border-radius:50%;background:var(--secondary);margin-top:6px"></span>' : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function markAllNotificationsAsRead() {
+      DB.markNotificationsRead();
+      Toast.show('All notifications marked as read.', 'success');
+      renderNotifications();
+    }
+  </script>
+</body>
+</html>

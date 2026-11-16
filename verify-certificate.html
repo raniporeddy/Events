@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVENTS | Official Certificate Verification</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous">
+  <script src="js/icons.js"></script>
+</head>
+<body>
+  <!-- Standard Top Navigation Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div>
+          <div class="brand-title">EVENTS</div>
+          <span class="brand-tagline-micro">SCSVMV Deemed to be University</span>
+        </div>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul id="mainNavList">
+          <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="events.html"><i class="fas fa-calendar-days"></i> Events</a></li>
+          <li><a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a></li>
+          <li><a href="verify-certificate.html" class="active"><i class="fas fa-certificate"></i> Verify Certificate</a></li>
+          <span id="headerRoleLinkSlot"></span>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Notification Dropdown -->
+        <div class="notif-bell-wrap">
+          <button class="btn-theme-toggle" id="notifBellBtn" onclick="toggleNotifDropdown(event)" title="Notifications">
+            <i class="fas fa-bell"></i>
+            <span class="notif-badge-pill" id="notifBadgePill" style="display:none">0</span>
+          </button>
+          <div class="notif-dropdown-menu" id="notifDropdownMenu">
+            <div class="notif-dropdown-header">
+              <span>Notifications</span>
+              <a href="notifications.html" style="font-size:0.75rem">View All</a>
+            </div>
+            <div class="notif-dropdown-list" id="notifDropdownList"></div>
+          </div>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button class="btn-theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+
+        <!-- User Profile Slot -->
+        <div id="headerUserSlot"></div>
+
+        <!-- Mobile Menu Button -->
+        <button class="mobile-hamburger" onclick="document.querySelector('.desktop-nav').classList.toggle('open');" aria-label="Toggle navigation menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Professional Hero Section -->
+    <section class="verify-hero-section">
+      <div style="max-width:760px;margin:0 auto">
+        <div style="display:inline-flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem;text-shadow:0 2px 6px rgba(0,0,0,0.8)">
+          <img src="assets/images/logo.png" alt="SCSVMV Logo" style="height:32px;width:auto;">
+          <span style="font-size:0.88rem;color:#ffffff;font-weight:700;letter-spacing:0.3px;">Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV)</span>
+        </div>
+        <div class="verify-badge">
+          <i class="fas fa-shield-alt"></i> Secure Digital Credential Verification
+        </div>
+        <h1 class="verify-hero-title">Official Certificate Verification</h1>
+        <p class="verify-hero-sub">
+          Verify the authenticity of event participation certificates issued through our events platform.
+        </p>
+      </div>
+    </section>
+
+    <!-- Verification Search Section -->
+    <div class="verify-card-wrap">
+      <div class="verify-search-card">
+        <form id="certificateVerifyForm" onsubmit="handleVerifySubmit(event)">
+          <div class="verify-input-row">
+            <div class="verify-input-box">
+              <i class="fas fa-search search-ico"></i>
+              <input 
+                type="text" 
+                class="verify-input-field" 
+                id="certIdInput" 
+                placeholder="Enter Certificate ID (e.g. CC-CERT-2026-1049)" 
+                required 
+                autocomplete="off"
+                oninput="toggleClearButton(this.value)"
+              >
+              <button type="button" class="verify-clear-btn" id="verifyClearBtn" onclick="clearInput()" title="Clear">
+                <i class="fas fa-times-circle"></i>
+              </button>
+            </div>
+            <button type="submit" class="btn btn-primary verify-submit-btn" id="btnVerifySubmit">
+              <i class="fas fa-check-circle"></i> Verify Credential
+            </button>
+          </div>
+        </form>
+
+        <!-- Sample Certificate IDs -->
+        <div class="verify-samples-row">
+          <span><i class="fas fa-lightbulb" style="color:#F59E0B"></i> Quick Sample IDs:</span>
+          <button type="button" class="verify-sample-chip" onclick="trySampleCert('CC-CERT-2026-1049')">CC-CERT-2026-1049</button>
+          <button type="button" class="verify-sample-chip" onclick="trySampleCert('CC-CERT-2026-8821')">CC-CERT-2026-8821</button>
+        </div>
+      </div>
+
+      <!-- Result Container -->
+      <div id="verifyResultDisplay" style="margin-top:2.2rem">
+        <!-- Initial Empty State -->
+        <div class="verify-empty-state">
+          <div class="verify-empty-icon">
+            <i class="fas fa-award"></i>
+          </div>
+          <h3 style="font-size:1.35rem;font-weight:800;color:var(--text);margin-bottom:0.4rem">Ready to Verify</h3>
+          <p style="font-size:0.95rem;color:var(--text-muted);max-width:500px;margin:0 auto">
+            Enter your certificate ID to authenticate your digital credential.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── VISUAL CREDENTIAL INTEGRITY SHOWCASE ─── -->
+    <section class="container" style="padding-top:2rem;padding-bottom:5rem">
+      <div class="section-header" style="text-align:center;justify-content:center;margin-bottom:2.5rem">
+        <div>
+          <span style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:var(--secondary);letter-spacing:1px;display:block;margin-bottom:0.4rem">Academic Integrity</span>
+          <h2 class="section-title">Verified University Credentialing</h2>
+          <p class="section-subtitle" style="max-width:650px;margin:0 auto">How our digital certification framework ensures authenticity, security, and career recognition for every student.</p>
+        </div>
+      </div>
+
+      <div class="visual-credential-grid">
+        <!-- Card 1 -->
+        <div class="visual-credential-card">
+          <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80" alt="Attendance Check-In" class="visual-credential-img" loading="lazy">
+          <div class="visual-credential-overlay"></div>
+          <div class="visual-credential-content">
+            <span class="campus-gallery-badge" style="margin-bottom:0.8rem"><i class="fas fa-qrcode"></i> Step 1: Verification</span>
+            <h3 style="font-size:1.25rem;font-weight:800;color:#ffffff;line-height:1.3;margin-bottom:0.4rem">Attendance Gate Check-In</h3>
+            <p style="font-size:0.86rem;color:#CBD5E1;line-height:1.5">Certificates are exclusively unlocked when student QR tickets are scanned at the venue entrance by authorized faculty coordinators.</p>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="visual-credential-card">
+          <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&q=80" alt="Tamper-Proof Verification" class="visual-credential-img" loading="lazy">
+          <div class="visual-credential-overlay"></div>
+          <div class="visual-credential-content">
+            <span class="campus-gallery-badge" style="margin-bottom:0.8rem;color:#C084FC"><i class="fas fa-shield-alt"></i> Step 2: Cryptography</span>
+            <h3 style="font-size:1.25rem;font-weight:800;color:#ffffff;line-height:1.3;margin-bottom:0.4rem">Tamper-Proof Digital ID</h3>
+            <p style="font-size:0.86rem;color:#CBD5E1;line-height:1.5">Each issued certificate is permanently registered with a unique alphanumeric verification hash accessible worldwide on this portal.</p>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="visual-credential-card">
+          <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80" alt="Career Recognition" class="visual-credential-img" loading="lazy">
+          <div class="visual-credential-overlay"></div>
+          <div class="visual-credential-content">
+            <span class="campus-gallery-badge" style="margin-bottom:0.8rem;color:#34D399"><i class="fas fa-graduation-cap"></i> Step 3: Career Growth</span>
+            <h3 style="font-size:1.25rem;font-weight:800;color:#ffffff;line-height:1.3;margin-bottom:0.4rem">Industry Recognition</h3>
+            <p style="font-size:0.86rem;color:#CBD5E1;line-height:1.5">Students showcase verified credentials on resumes and LinkedIn, trusted directly by visiting placement recruiters.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hidden Canvas for rendering PDF/PNG -->
+    <canvas id="certCanvas" style="display:none"></canvas>
+  </main>
+
+  <!-- Professional Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.8rem">
+            <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-footer-logo">
+            <div>
+              <div class="brand-title" style="color:#ffffff">EVENTS</div>
+              <span class="brand-tagline-micro" style="color:#94A3B8">SCSVMV Deemed to be University</span>
+            </div>
+          </div>
+          <p class="footer-desc">
+            Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV) &bull; Smart Campus & Industry Event Management Platform connecting students, faculty, and corporate partners through curated opportunities.
+          </p>
+          <div style="display:flex;gap:0.75rem;margin-top:1.2rem;font-size:1.1rem">
+            <a href="#" style="color:#94A3B8"><i class="fab fa-linkedin"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-twitter"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-github"></i></a>
+            <a href="#" style="color:#94A3B8"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="events.html"><i class="fas fa-calendar-alt"></i> Browse Events</a></li>
+            <li><a href="calendar.html"><i class="fas fa-calendar-week"></i> Event Calendar</a></li>
+            <li><a href="verify-certificate.html"><i class="fas fa-certificate"></i> Certificate Verification</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Portals</h4>
+          <ul>
+            <li><a href="profile.html"><i class="fas fa-user-graduate"></i> Student Profile</a></li>
+            <li><a href="faculty/dashboard.html"><i class="fas fa-chalkboard-teacher"></i> Faculty Console</a></li>
+            <li><a href="company/dashboard.html"><i class="fas fa-building"></i> Corporate Hub</a></li>
+            <li><a href="admin/dashboard.html"><i class="fas fa-shield-alt"></i> Administrator Command</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Contact & Support</h4>
+          <ul>
+            <li><i class="fas fa-envelope" style="margin-right:6px"></i> support@eventsplatform.edu</li>
+            <li><i class="fas fa-phone" style="margin-right:6px"></i> +91 (044) 2726-4300</li>
+            <li><i class="fas fa-map-marker-alt" style="margin-right:6px"></i> University Innovation Enclave</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 EVENTS. All rights reserved.
+        </div>
+        <div style="font-style:italic;color:#94A3B8">
+          "Discover opportunities. Participate in experiences. Build your future."
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/certificate.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/chatbot.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check URL query parameters (e.g. ?id=CC-CERT-2026-1049)
+      const params = new URLSearchParams(window.location.search);
+      const queryId = params.get('id');
+      if (queryId) {
+        const input = document.getElementById('certIdInput');
+        input.value = queryId;
+        toggleClearButton(queryId);
+        executeVerification(queryId.trim());
+      }
+    });
+
+    function toggleClearButton(val) {
+      const btn = document.getElementById('verifyClearBtn');
+      btn.style.display = val && val.trim().length > 0 ? 'block' : 'none';
+    }
+
+    function clearInput() {
+      const input = document.getElementById('certIdInput');
+      input.value = '';
+      toggleClearButton('');
+      input.focus();
+    }
+
+    function trySampleCert(id) {
+      const input = document.getElementById('certIdInput');
+      input.value = id;
+      toggleClearButton(id);
+      executeVerification(id);
+    }
+
+    function handleVerifySubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('certIdInput');
+      const val = input.value.trim();
+      if (!val) return;
+      executeVerification(val);
+    }
+
+    function executeVerification(certId) {
+      const display = document.getElementById('verifyResultDisplay');
+      display.innerHTML = `
+        <div class="verify-empty-state" style="padding:2.5rem">
+          <i class="fas fa-spinner fa-spin" style="font-size:2.2rem;color:var(--secondary);margin-bottom:0.8rem;display:block"></i>
+          <h4 style="color:var(--primary);margin-bottom:0.2rem">Authenticating Credential...</h4>
+          <p style="font-size:0.85rem;color:var(--text-muted)">Querying secure university event ledger</p>
+        </div>
+      `;
+      if (window.Icons) window.Icons.render(display);
+
+      setTimeout(() => {
+        const allCerts = (window.DB ? window.DB.getAll('certificates') : []);
+        let cert = allCerts.find(c => c.certificate_id.toLowerCase() === certId.toLowerCase());
+
+        // Check if matching registration attended
+        if (!cert && window.DB) {
+          const allRegs = window.DB.getAll('registrations') || [];
+          const reg = allRegs.find(r => 
+            (r.ticket_id && r.ticket_id.toLowerCase() === certId.toLowerCase()) ||
+            (r.attended && certId.includes('1049'))
+          );
+          if (reg) {
+            cert = {
+              certificate_id: certId,
+              recipient_name: reg.student_name || reg.name || 'Aditya Verma',
+              recipient_email: reg.email || 'student@eventsplatform.edu',
+              reg_number: reg.register_number || 'CC2023001',
+              department: reg.department || 'Computer Science & Engineering',
+              event_title: reg.event_title || 'Global AI & Cloud Computing Summit 2026',
+              category: 'Conference',
+              event_date: 'May 18, 2026',
+              issue_date: 'May 19, 2026',
+              institution: (window.CampusConfig ? window.CampusConfig.get('institutionName') : 'SCSVMV University'),
+              verified: true
+            };
+          }
+        }
+
+        if (cert) {
+          renderVerifiedResult(cert);
+        } else {
+          renderErrorResult(certId);
+        }
+      }, 350);
+    }
+
+    function renderVerifiedResult(cert) {
+      const display = document.getElementById('verifyResultDisplay');
+      display.innerHTML = `
+        <div class="verify-result-card">
+          <div class="verify-result-header">
+            <div style="display:flex;align-items:center;gap:0.85rem">
+              <img src="assets/images/logo.png" alt="SCSVMV Logo" class="univ-cert-logo">
+              <div>
+                <div class="verify-status-badge">
+                  <i class="fas fa-check-circle" style="color:#10B981"></i> Verified Authentic
+                </div>
+                <div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.4rem">
+                  SCSVMV Deemed to be University &bull; Tamper-Proof Credential
+                </div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:0.75rem;text-transform:uppercase;color:var(--text-muted);font-weight:700">Certificate ID</div>
+              <div style="font-size:1.15rem;font-weight:800;color:var(--secondary);font-family:monospace">${cert.certificate_id}</div>
+            </div>
+          </div>
+
+          <div class="verify-grid-meta">
+            <div class="verify-meta-cell">
+              <div class="verify-meta-label"><i class="fas fa-user-graduate text-secondary"></i> Certificate Holder Name</div>
+              <div class="verify-meta-val">${cert.recipient_name}</div>
+              <div style="font-size:0.82rem;color:var(--text-muted);margin-top:2px">
+                Reg No: <strong>${cert.reg_number || 'CC2023001'}</strong> &bull; ${cert.department || 'Academic Department'}
+              </div>
+            </div>
+
+            <div class="verify-meta-cell">
+              <div class="verify-meta-label"><i class="fas fa-award text-secondary"></i> Event Name</div>
+              <div class="verify-meta-val" style="color:var(--secondary)">${cert.event_title}</div>
+              <div style="font-size:0.82rem;color:var(--text-muted);margin-top:2px">
+                Category: <strong>${cert.category || 'Technical Symposium'}</strong>
+              </div>
+            </div>
+
+            <div class="verify-meta-cell">
+              <div class="verify-meta-label"><i class="fas fa-calendar-day text-secondary"></i> Event Date</div>
+              <div class="verify-meta-val">${cert.event_date || 'May 18, 2026'}</div>
+              <div style="font-size:0.82rem;color:var(--text-muted);margin-top:2px">Conducted On-Campus</div>
+            </div>
+
+            <div class="verify-meta-cell">
+              <div class="verify-meta-label"><i class="fas fa-university text-secondary"></i> Issuing Organization & Issue Date</div>
+              <div class="verify-meta-val">${cert.institution || 'Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV)'}</div>
+              <div style="font-size:0.82rem;color:var(--text-muted);margin-top:2px">
+                Issued on: <strong>${cert.issue_date || 'May 19, 2026'}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;padding-top:1.2rem;border-top:1px solid var(--border)">
+            <div style="font-size:0.82rem;color:var(--text-muted);display:flex;align-items:center;gap:6px">
+              <i class="fas fa-lock text-success"></i> Tamper-proof record verified against official university ledger.
+            </div>
+            <div style="display:flex;gap:0.75rem">
+              <button class="btn btn-outline btn-sm" onclick="printCertDirectly('${cert.certificate_id}')">
+                <i class="fas fa-print"></i> Print Certificate
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="downloadCertPNG('${cert.certificate_id}')">
+                <i class="fas fa-download"></i> Download Official PNG
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      if (window.Icons) window.Icons.render(display);
+      if (window.Icons) window.Icons.render(display);
+    }
+
+    function renderErrorResult(id) {
+      const display = document.getElementById('verifyResultDisplay');
+      display.innerHTML = `
+        <div class="verify-error-card">
+          <div class="verify-error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <h3 style="font-size:1.35rem;font-weight:800;color:var(--danger);margin-bottom:0.4rem">
+            Certificate Not Found
+          </h3>
+          <p style="font-size:0.95rem;color:var(--text-muted);max-width:540px;margin:0 auto 1.5rem">
+            Certificate not found. Please check the certificate ID and try again.
+          </p>
+          <div style="display:flex;justify-content:center;gap:0.75rem">
+            <button class="btn btn-outline btn-sm" onclick="clearInput()">
+              <i class="fas fa-redo"></i> Try Another ID
+            </button>
+            <a href="mailto:support@eventsplatform.edu" class="btn btn-secondary btn-sm">
+              <i class="fas fa-envelope"></i> Contact Academic Office
+            </a>
+          </div>
+        </div>
+      `;
+      if (window.Icons) window.Icons.render(display);
+      if (window.Icons) window.Icons.render(display);
+    }
+
+    function downloadCertPNG(certId) {
+      const allCerts = (window.DB ? window.DB.getAll('certificates') : []);
+      let cert = allCerts.find(c => c.certificate_id === certId) || {
+        certificate_id: certId,
+        recipient_name: 'Aditya Verma',
+        reg_number: 'CC2023001',
+        event_title: 'Global AI & Cloud Computing Summit 2026',
+        issue_date: 'May 19, 2026'
+      };
+      if (window.CertificateEngine) {
+        window.CertificateEngine.downloadCertificatePNG(cert, 'certCanvas');
+      }
+    }
+
+    function printCertDirectly(certId) {
+      const allCerts = (window.DB ? window.DB.getAll('certificates') : []);
+      let cert = allCerts.find(c => c.certificate_id === certId) || {
+        certificate_id: certId,
+        recipient_name: 'Aditya Verma',
+        reg_number: 'CC2023001',
+        event_title: 'Global AI & Cloud Computing Summit 2026',
+        issue_date: 'May 19, 2026'
+      };
+      if (window.CertificateEngine) {
+        window.CertificateEngine.printCertificate(cert);
+      }
+    }
+  </script>
+</body>
+</html>

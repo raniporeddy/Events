@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVENTS | Event Registration & QR Pass</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/chatbot.js"></script>
+</head>
+<body>
+
+  <!-- ─── HEADER ─── -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div>
+          <div class="brand-title">EVENTS</div>
+          <span class="brand-tagline-micro">SCSVMV Deemed to be University</span>
+        </div>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul id="mainNavList">
+          <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="events.html"><i class="fas fa-calendar-days"></i> Events</a></li>
+          <li><a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a></li>
+          <li><a href="verify-certificate.html"><i class="fas fa-certificate"></i> Verify Certificate</a></li>
+          <span id="headerRoleLinkSlot"></span>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+
+        <div class="notif-bell-wrap">
+          <button class="btn-bell" onclick="toggleNotifDropdown(event)">
+            <i class="fas fa-bell"></i>
+            <span class="notif-badge-pill" id="notifBadgePill" style="display:none;">0</span>
+          </button>
+          <div class="notif-dropdown-menu" id="notifDropdownMenu">
+            <div class="notif-menu-header">
+              <h4>Notifications</h4>
+              <span style="font-size:0.75rem;color:var(--secondary);font-weight:600;cursor:pointer;" onclick="toggleNotifDropdown(event)">Close</span>
+            </div>
+            <div class="notif-list-container" id="notifDropdownList"></div>
+          </div>
+        </div>
+
+        <div id="headerUserSlot"></div>
+
+        <button class="mobile-hamburger" onclick="document.querySelector('.desktop-nav').classList.toggle('open');">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── BANNER ─── -->
+  <section class="visual-page-hero" style="background-image:url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80')">
+    <div class="container">
+      <div style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.88rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#93C5FD;margin-bottom:1rem;text-shadow:0 2px 6px rgba(0,0,0,0.8)">
+        <i class="fas fa-ticket-alt" style="color:#FBBF24"></i> Digital Pass & Credential Access
+      </div>
+      <h1 class="visual-page-hero-title">
+        Event <span>Registration</span>
+      </h1>
+      <p class="visual-page-hero-sub">
+        Claim your verified pass with an encrypted QR code ticket for contactless gate check-in and automated certificate unlocking.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─── REGISTRATION CONTAINER ─── -->
+  <main class="container" style="max-width:760px;">
+    <!-- Step 1: Registration Form -->
+    <div class="form-card" id="registrationFormCard">
+      <div style="margin-bottom:1.8rem;border-bottom:1px solid var(--border);padding-bottom:1.2rem;">
+        <h2 style="font-size:1.35rem;font-weight:800;color:var(--text);margin-bottom:0.3rem;">Attendee Details</h2>
+        <p style="font-size:0.88rem;color:var(--text-muted);">Please confirm your academic or professional information for badge generation.</p>
+      </div>
+
+      <form id="eventRegistrationForm" onsubmit="handleRegistrationSubmit(event)">
+        <!-- Event Selection -->
+        <div class="form-group">
+          <label><i class="fas fa-calendar-check"></i> Selected Event *</label>
+          <select id="regEventSelect" required onchange="onSelectedEventChange()">
+            <option value="">-- Choose an Event --</option>
+          </select>
+        </div>
+
+        <!-- Event Summary Preview Pill -->
+        <div id="eventSummaryPill" style="display:none;background:var(--surface-alt);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1.4rem;"></div>
+
+        <!-- Personal Info -->
+        <div class="form-row">
+          <div class="form-group">
+            <label><i class="fas fa-user"></i> Attendee Full Name *</label>
+            <input type="text" id="regAttendeeName" placeholder="Full name as printed on certificate" required>
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-envelope"></i> Official Email Address *</label>
+            <input type="email" id="regAttendeeEmail" placeholder="e.g. aditya.v@student.events.edu" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label><i class="fas fa-id-card"></i> Register Number / Student ID</label>
+            <input type="text" id="regAttendeeId" placeholder="e.g. CC2023001">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-graduation-cap"></i> Academic Department *</label>
+            <select id="regAttendeeDept" required>
+              <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+              <option value="Artificial Intelligence & Data Science">AI & Data Science</option>
+              <option value="Electronics & Communication Engineering">ECE</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Management & Business Administration">MBA</option>
+              <option value="External / Industry Guest">External / Industry Guest</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-phone"></i> Mobile Number (for SMS & WhatsApp Ticket Pass)</label>
+          <input type="tel" id="regAttendeePhone" placeholder="+91 98765 43210">
+        </div>
+
+        <!-- Notification Preferences -->
+        <div style="margin:1.4rem 0;padding:1rem;background:var(--surface-alt);border-radius:10px;border:1px solid var(--border);">
+          <div style="font-weight:700;font-size:0.88rem;color:var(--text);margin-bottom:0.5rem;"><i class="fas fa-paper-plane text-secondary"></i> Ticket Delivery & Reminder Preferences</div>
+          <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:0.45rem;font-size:0.86rem;color:var(--text);cursor:pointer;">
+              <input type="checkbox" id="prefEmail" checked> <i class="fas fa-envelope text-primary"></i> Email Notification
+            </label>
+            <label style="display:flex;align-items:center;gap:0.45rem;font-size:0.86rem;color:var(--text);cursor:pointer;">
+              <input type="checkbox" id="prefWhatsapp" checked> <i class="fab fa-whatsapp text-success"></i> WhatsApp Ticket
+            </label>
+            <label style="display:flex;align-items:center;gap:0.45rem;font-size:0.86rem;color:var(--text);cursor:pointer;">
+              <input type="checkbox" id="prefSms"> <i class="fas fa-sms text-warning"></i> SMS Reminder
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" style="width:100%;" id="btnConfirmReg">
+          <i class="fas fa-check-circle"></i> Confirm Registration & Generate Pass
+        </button>
+      </form>
+    </div>
+
+    <!-- Step 2: Instant Ticket Confirmation Box (Hidden initially) -->
+    <div class="form-card" id="registrationSuccessCard" style="display:none;text-align:center;">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--success-bg);color:var(--success);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1.2rem;">
+        <i class="fas fa-check"></i>
+      </div>
+
+      <h2 style="font-size:1.6rem;font-weight:800;color:var(--text);margin-bottom:0.4rem;" id="successHeading">
+        Registration Confirmed!
+      </h2>
+      <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:2rem;" id="successSubtext">
+        Your digital ticket pass has been generated. Save or present your QR code at the event entrance for verified check-in.
+      </p>
+
+      <!-- Digital Pass Card -->
+      <div style="max-width:440px;margin:0 auto 2rem;background:var(--surface-alt);border:2px dashed var(--secondary);border-radius:16px;padding:2rem;position:relative;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-bottom:0.6rem;">
+          <img src="assets/images/logo.png" alt="SCSVMV Logo" style="height:34px;width:auto;">
+          <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--secondary);letter-spacing:1px;">SCSVMV Official Pass</div>
+        </div>
+        <h3 id="ticketEventTitle" style="font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:0.8rem;"></h3>
+
+        <!-- QR Code Container -->
+        <div id="ticketQrContainer" style="display:flex;justify-content:center;margin:1.4rem 0;"></div>
+
+        <div style="font-family:monospace;font-size:1rem;font-weight:800;color:var(--secondary);background:var(--surface);padding:0.4rem 0.8rem;border-radius:6px;display:inline-block;border:1px solid var(--border);" id="ticketPassId">
+          CC-TKT-2026-0000
+        </div>
+
+        <div style="text-align:left;margin-top:1.4rem;font-size:0.85rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:1rem;display:flex;flex-direction:column;gap:0.3rem;">
+          <div><strong><i class="fas fa-user text-secondary"></i> Attendee:</strong> <span id="ticketAttendeeName"></span></div>
+          <div><strong><i class="fas fa-calendar-day text-secondary"></i> Date:</strong> <span id="ticketEventDate"></span></div>
+          <div><strong><i class="fas fa-map-marker-alt text-secondary"></i> Venue:</strong> <span id="ticketEventVenue"></span></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <a href="profile.html" class="btn btn-primary"><i class="fas fa-ticket-alt"></i> View in My Passes</a>
+        <button class="btn btn-secondary" onclick="window.print()"><i class="fas fa-print"></i> Print Ticket Pass</button>
+        <a href="events.html" class="btn btn-outline"><i class="fas fa-calendar-alt"></i> Explore More Events</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-bottom" style="border-top:none;padding-top:0;">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <img src="assets/images/logo.png" alt="SCSVMV Logo" style="height:32px;width:auto;">
+          <div>&copy; 2026 EVENTS &bull; Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya (SCSVMV). All rights reserved.</div>
+        </div>
+        <div style="display:flex;gap:1.5rem;">
+          <a href="index.html" style="color:#94A3B8;"><i class="fas fa-home"></i> Home</a>
+          <a href="events.html" style="color:#94A3B8;"><i class="fas fa-calendar-days"></i> Events</a>
+          <a href="calendar.html" style="color:#94A3B8;"><i class="fas fa-calendar"></i> Calendar</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── SCRIPT LOGIC ─── -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!window.DB) return;
+
+      const events = window.DB.getAll('events').filter(e => e.approval === 'approved');
+      const select = document.getElementById('regEventSelect');
+      const paramEventId = new URLSearchParams(window.location.search).get('event');
+
+      events.forEach(ev => {
+        const opt = document.createElement('option');
+        opt.value = ev.id;
+        opt.textContent = `${ev.title} (${formatDate(ev.date)})`;
+        if (paramEventId && paramEventId === ev.id) {
+          opt.selected = true;
+        }
+        select.appendChild(opt);
+      });
+
+      // Pre-fill user data if logged in
+      const session = window.Auth ? window.Auth.getSession() : null;
+      if (session) {
+        document.getElementById('regAttendeeName').value = session.name || '';
+        document.getElementById('regAttendeeEmail').value = session.email || '';
+        if (session.reg_number) document.getElementById('regAttendeeId').value = session.reg_number;
+        if (session.department) document.getElementById('regAttendeeDept').value = session.department;
+      }
+
+      onSelectedEventChange();
+    });
+
+    function onSelectedEventChange() {
+      const eventId = document.getElementById('regEventSelect').value;
+      const previewPill = document.getElementById('eventSummaryPill');
+      if (!eventId || !window.DB) {
+        previewPill.style.display = 'none';
+        return;
+      }
+
+      const ev = window.DB.getById('events', 'id', eventId);
+      if (ev) {
+        previewPill.style.display = 'block';
+        previewPill.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <strong style="color:var(--text);font-size:1rem;display:block;">${ev.title}</strong>
+              <div style="font-size:0.83rem;color:var(--text-muted);margin-top:0.2rem;">
+                <i class="fas fa-calendar-alt" style="color:var(--secondary);"></i> ${formatDate(ev.date)} at ${formatTime(ev.time)} &bull; <i class="fas fa-map-marker-alt" style="color:var(--secondary);"></i> ${ev.venue}
+              </div>
+            </div>
+            <span class="event-status-pill status-${ev.status}">${ev.status}</span>
+          </div>
+        `;
+      }
+    }
+
+    function handleRegistrationSubmit(e) {
+      e.preventDefault();
+      const eventId = document.getElementById('regEventSelect').value;
+      if (!eventId) {
+        showToast('Please choose an event to register.', 'warning');
+        return;
+      }
+
+      const name = document.getElementById('regAttendeeName').value.trim();
+      const email = document.getElementById('regAttendeeEmail').value.trim();
+      const reg_number = document.getElementById('regAttendeeId').value.trim();
+      const department = document.getElementById('regAttendeeDept').value;
+      const phone = document.getElementById('regAttendeePhone').value.trim();
+
+      const session = window.Auth ? window.Auth.getSession() : null;
+      const userData = {
+        userId: session ? session.userId : 'USR_' + Date.now(),
+        name,
+        email,
+        reg_number,
+        department,
+        phone,
+        user_type: session ? session.role : 'student'
+      };
+
+      const preferences = {
+        email: document.getElementById('prefEmail').checked,
+        whatsapp: document.getElementById('prefWhatsapp').checked,
+        sms: document.getElementById('prefSms').checked
+      };
+
+      const btn = document.getElementById('btnConfirmReg');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reserving Seat & Pass...';
+
+      const res = window.DB.registerForEvent(eventId, userData, preferences);
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Registration & Generate Pass';
+
+      if (res.ok) {
+        showToast(res.msg, res.waitlist ? 'warning' : 'success');
+
+        // Show Confirmation Card
+        document.getElementById('registrationFormCard').style.display = 'none';
+        const successCard = document.getElementById('registrationSuccessCard');
+        successCard.style.display = 'block';
+
+        if (res.waitlist) {
+          document.getElementById('successHeading').textContent = 'Waitlist Entry Confirmed!';
+          document.getElementById('successSubtext').textContent = 'Event capacity has been reached. You have been placed on the automated waitlist queue.';
+        }
+
+        const ticket = res.ticket;
+        document.getElementById('ticketEventTitle').textContent = ticket.event_title;
+        document.getElementById('ticketPassId').textContent = ticket.ticket_id;
+        document.getElementById('ticketAttendeeName').textContent = ticket.name;
+        document.getElementById('ticketEventDate').textContent = `${formatDate(ticket.event_date)} at ${formatTime(ticket.event_time)}`;
+        document.getElementById('ticketEventVenue').textContent = ticket.event_venue;
+
+        // Render QR Code Ticket
+        if (window.AttendanceSystem) {
+          window.AttendanceSystem.renderQRCode('ticketQrContainer', ticket.ticket_id, 160);
+        }
+      } else {
+        showToast(res.msg, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

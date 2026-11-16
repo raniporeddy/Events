@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Reports & Certs | EVENTS Admin</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="../js/icons.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="../index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div class="logo-text">
+          <span class="logo-title">EVENTS</span>
+          <span class="logo-tagline">SCSVMV &bull; Administrator Console</span>
+        </div>
+      </a>
+      
+      <div class="header-actions">
+        <a href="dashboard.html" class="btn btn-outline btn-sm"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+        <div class="header-user-menu" id="headerUserMenu"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-layout">
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-univ-badge">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo">
+        <span>SCSVMV Deemed to be University</span>
+      </div>
+      <ul class="sidebar-menu-list">
+        <li class="sidebar-menu-heading">Navigation</li>
+        <li><a href="dashboard.html" class="sidebar-menu-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="manage-events.html" class="sidebar-menu-link"><i class="fas fa-calendar-alt"></i> Manage Events</a></li>
+        <li><a href="users.html" class="sidebar-menu-link"><i class="fas fa-users-cog"></i> Users & Roles</a></li>
+        <li><a href="attendance-reports.html" class="sidebar-menu-link active"><i class="fas fa-chart-line"></i> Attendance Reports</a></li>
+        <li><a href="system-settings.html" class="sidebar-menu-link"><i class="fas fa-sliders-h"></i> Settings</a></li>
+      </ul>
+    </aside>
+
+    <main class="dashboard-main">
+      <div style="position:relative;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);border:1px solid rgba(255,255,255,0.15);padding:2.2rem 2rem;color:#fff;background:url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80') center/cover no-repeat;margin-bottom:2rem">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg, rgba(10,17,40,0.92) 0%, rgba(16,27,63,0.85) 50%, rgba(30,41,90,0.94) 100%);"></div>
+        <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem">
+          <div>
+            <span class="campus-gallery-badge" style="margin-bottom:0.6rem"><i class="fas fa-chart-line"></i> Institutional Telemetry</span>
+            <h1 style="font-family:'Montserrat',sans-serif;font-size:1.9rem;font-weight:900;color:#ffffff;margin-bottom:0.35rem">Attendance & Certification Analytics</h1>
+            <p style="color:#CBD5E1;font-size:0.92rem;max-width:640px;line-height:1.5">University-wide attendance records, student QR pass validation metrics, and digital certificate tracking.</p>
+          </div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="exportMasterAttendanceCSV()"><i class="fas fa-file-csv"></i> Export All Attendance</button>
+            <button class="btn btn-outline btn-sm" style="color:#ffffff;border-color:rgba(255,255,255,0.4)" onclick="exportCertificatesCSV()"><i class="fas fa-certificate"></i> Export Certificates</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview Metric Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap primary"><i class="fas fa-clipboard-list"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Total Registrations</span>
+            <span class="kpi-value" id="kpiRepTotalRegs">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap success"><i class="fas fa-user-check"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Checked-in Attendees</span>
+            <span class="kpi-value" id="kpiRepAttended">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap info"><i class="fas fa-percentage"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Overall Attendance Rate</span>
+            <span class="kpi-value" id="kpiRepRate">0%</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap accent"><i class="fas fa-award"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Certificates Issued</span>
+            <span class="kpi-value" id="kpiRepCerts">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Attendance Summary Table -->
+      <div class="dash-card" style="margin-bottom:2rem">
+        <div class="dash-card-header">
+          <div>
+            <h3 class="dash-card-title"><i class="fas fa-calendar-check text-secondary"></i> Per-Event Attendance Summary</h3>
+            <p class="dash-card-subtitle">Aggregated attendance percentages and capacity metrics</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-calendar-check"></i> Event Title</th>
+                <th><i class="fas fa-tag"></i> Category</th>
+                <th><i class="fas fa-calendar-day"></i> Date</th>
+                <th><i class="fas fa-users"></i> Capacity</th>
+                <th><i class="fas fa-user-friends"></i> Confirmed</th>
+                <th><i class="fas fa-user-check"></i> Attended</th>
+                <th><i class="fas fa-percentage"></i> Attendance %</th>
+                <th style="text-align:right"><i class="fas fa-file-csv"></i> Roster Export</th>
+              </tr>
+            </thead>
+            <tbody id="eventAttendanceSummaryBody">
+              <tr><td colspan="8" style="text-align:center;padding:2rem"><i class="fas fa-spinner fa-spin"></i> Calculating attendance metrics...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Master Check-in Log Table -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div>
+            <h3 class="dash-card-title"><i class="fas fa-user-check text-success"></i> Individual Student Check-In & Certification Log</h3>
+            <p class="dash-card-subtitle">Real-time gate scans and verified certificates</p>
+          </div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+            <select class="form-input" id="reportEventFilter" style="width:auto;padding:0.45rem 0.8rem;font-size:0.85rem">
+              <option value="all">📅 All Events</option>
+            </select>
+            <div style="position:relative">
+              <i class="fas fa-search" style="position:absolute;left:0.8rem;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.8rem;pointer-events:none"></i>
+              <input type="text" class="form-input" id="reportSearchInput" placeholder="Filter by student, roll no, or ticket..." style="width:260px;padding:0.45rem 0.8rem 0.45rem 2.1rem;font-size:0.85rem">
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="max-height:480px;overflow-y:auto">
+          <table class="data-table" style="font-size:0.86rem">
+            <thead>
+              <tr>
+                <th><i class="fas fa-ticket-alt"></i> Ticket ID</th>
+                <th><i class="fas fa-user-graduate"></i> Student Name</th>
+                <th><i class="fas fa-id-card"></i> Register No</th>
+                <th><i class="fas fa-graduation-cap"></i> Department</th>
+                <th><i class="fas fa-calendar-alt"></i> Event</th>
+                <th><i class="fas fa-qrcode"></i> Check-in Status</th>
+                <th><i class="fas fa-award"></i> Certificate ID</th>
+              </tr>
+            </thead>
+            <tbody id="detailedAttendanceBody">
+              <tr><td colspan="7" style="text-align:center;padding:2rem"><i class="fas fa-spinner fa-spin"></i> Loading records...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/script.js"></script>
+  <script>
+    let allRegs = [];
+    let allEvents = [];
+    let allCerts = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Auth.requireRole(['admin'], '../auth.html');
+      if (!user) return;
+
+      loadReportsData();
+
+      document.getElementById('reportEventFilter').addEventListener('change', renderDetailedLog);
+      document.getElementById('reportSearchInput').addEventListener('input', renderDetailedLog);
+    });
+
+    function loadReportsData() {
+      allEvents = DB.getAll('events');
+      allRegs = DB.getAll('registrations');
+      allCerts = DB.getAll('certificates');
+
+      const totalRegs = allRegs.length;
+      const attended = allRegs.filter(r => r.attended).length;
+      const rate = totalRegs > 0 ? Math.round((attended / totalRegs) * 100) : 0;
+
+      document.getElementById('kpiRepTotalRegs').textContent = totalRegs;
+      document.getElementById('kpiRepAttended').textContent = attended;
+      document.getElementById('kpiRepRate').textContent = `${rate}%`;
+      document.getElementById('kpiRepCerts').textContent = allCerts.length;
+
+      populateEventDropdown();
+      renderSummaryTable();
+      renderDetailedLog();
+    }
+
+    function populateEventDropdown() {
+      const sel = document.getElementById('reportEventFilter');
+      allEvents.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.id;
+        opt.textContent = `${e.title} (${e.date})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function renderSummaryTable() {
+      const tbody = document.getElementById('eventAttendanceSummaryBody');
+      if (!allEvents.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted)">No events found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = allEvents.map(e => {
+        const evRegs = allRegs.filter(r => r.event_id === e.id);
+        const attended = evRegs.filter(r => r.attended).length;
+        const rate = evRegs.length > 0 ? Math.round((attended / evRegs.length) * 100) : 0;
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700;color:var(--primary)">${e.title}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted)">ID: ${e.id}</div>
+            </td>
+            <td><span class="badge" style="background:var(--secondary-light);color:var(--secondary)">${e.category}</span></td>
+            <td>${e.date}</td>
+            <td>${e.max_participants || 100}</td>
+            <td><strong>${evRegs.length}</strong></td>
+            <td><strong style="color:var(--success)">${attended}</strong></td>
+            <td>
+              <div style="font-weight:700">${rate}%</div>
+              <div class="capacity-meter" style="height:4px;margin-top:2px"><div class="capacity-fill" style="width:${rate}%"></div></div>
+            </td>
+            <td style="text-align:right">
+              <button class="btn btn-outline btn-xs" onclick="exportEventRoster('${e.id}')"><i class="fas fa-file-csv"></i> CSV</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderDetailedLog() {
+      const evFilter = document.getElementById('reportEventFilter').value;
+      const search = document.getElementById('reportSearchInput').value.toLowerCase().trim();
+
+      let filtered = allRegs;
+      if (evFilter !== 'all') {
+        filtered = filtered.filter(r => r.event_id === evFilter);
+      }
+
+      if (search) {
+        filtered = filtered.filter(r => 
+          (r.student_name && r.student_name.toLowerCase().includes(search)) ||
+          (r.ticket_id && r.ticket_id.toLowerCase().includes(search)) ||
+          (r.register_number && r.register_number.toLowerCase().includes(search)) ||
+          (r.department && r.department.toLowerCase().includes(search))
+        );
+      }
+
+      const tbody = document.getElementById('detailedAttendanceBody');
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">No matching student records found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => {
+        const cert = allCerts.find(c => c.ticket_id === r.ticket_id || (c.event_id === r.event_id && c.recipient_email === r.email));
+        return `
+          <tr>
+            <td><code style="font-weight:700;color:var(--secondary)">${r.ticket_id}</code></td>
+            <td><strong>${r.student_name || r.name}</strong></td>
+            <td>${r.register_number || 'N/A'}</td>
+            <td>${r.department || 'Campus'}</td>
+            <td><div style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.event_title}</div></td>
+            <td>
+              ${r.attended 
+                ? '<span class="status-badge status-confirmed"><i class="fas fa-check"></i> Attended</span>' 
+                : '<span class="status-badge" style="background:#f3f4f6;color:#6b7280"><i class="fas fa-clock"></i> Registered</span>'}
+            </td>
+            <td>
+              ${cert 
+                ? `<a href="../verify-certificate.html?id=${cert.certificate_id}" target="_blank" style="font-weight:700;color:var(--secondary);font-size:0.8rem"><i class="fas fa-award"></i> ${cert.certificate_id}</a>` 
+                : '<span style="font-size:0.75rem;color:var(--text-muted)">Not Issued</span>'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function exportEventRoster(eventId) {
+      const roster = allRegs.filter(r => r.event_id === eventId);
+      DB.downloadCSV(`event_${eventId}_roster`, roster);
+    }
+
+    function exportMasterAttendanceCSV() {
+      DB.downloadCSV('campusconnect_master_attendance', allRegs);
+    }
+
+    function exportCertificatesCSV() {
+      DB.downloadCSV('campusconnect_certificates', allCerts);
+    }
+  </script>
+</body>
+</html>

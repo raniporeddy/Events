@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Portal | EVENTS</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <script src="../js/icons.js"></script>
+</head>
+<body>
+  <!-- Global Top Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="../index.html" class="brand-logo" aria-label="SCSVMV EVENTS Home">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo" class="univ-brand-logo">
+        <div class="logo-text">
+          <span class="logo-title">EVENTS</span>
+          <span class="logo-tagline">SCSVMV &bull; Faculty & Organizer Portal</span>
+        </div>
+      </a>
+      
+      <div class="header-actions">
+        <a href="attendance-scanner.html" class="btn btn-outline btn-sm"><i class="fas fa-qrcode"></i> QR Scanner</a>
+        <a href="../create-event.html" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Create Event</a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+        <div class="header-user-menu" id="headerUserMenu"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-univ-badge">
+        <img src="../assets/images/logo.png" alt="SCSVMV University Logo">
+        <span>SCSVMV Deemed to be University</span>
+      </div>
+      <div class="sidebar-user-card" id="sidebarFacultyCard">
+        <div class="sidebar-user-avatar" id="facultyAvatar">F</div>
+        <div class="sidebar-user-meta">
+          <div class="sidebar-user-name" id="facultyName">Faculty Member</div>
+          <div class="sidebar-user-role" id="facultyDept">Department of Engineering</div>
+        </div>
+      </div>
+
+      <ul class="sidebar-menu-list">
+        <li class="sidebar-menu-heading">Organizer Controls</li>
+        <li><a href="dashboard.html" class="sidebar-menu-link active"><i class="fas fa-th-large"></i> Overview</a></li>
+        <li><a href="attendance-scanner.html" class="sidebar-menu-link"><i class="fas fa-qrcode"></i> Attendance Scanner</a></li>
+        <li><a href="../create-event.html" class="sidebar-menu-link"><i class="fas fa-calendar-plus"></i> Propose Event</a></li>
+
+        <li class="sidebar-menu-heading">Explore Campus</li>
+        <li><a href="../events.html" class="sidebar-menu-link"><i class="fas fa-calendar-alt"></i> All Campus Events</a></li>
+        <li><a href="../calendar.html" class="sidebar-menu-link"><i class="fas fa-calendar-day"></i> Academic Calendar</a></li>
+        <li><a href="../feedback.html" class="sidebar-menu-link"><i class="fas fa-star"></i> Reviews & Feedback</a></li>
+
+        <li class="sidebar-menu-heading">Account</li>
+        <li><a href="../profile.html" class="sidebar-menu-link"><i class="fas fa-user-circle"></i> My Profile</a></li>
+        <li><a href="#" onclick="Auth.logout()" class="sidebar-menu-link text-danger"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <div class="dashboard-page-header">
+        <div>
+          <h1 class="page-title"><i class="fas fa-chalkboard-teacher text-primary"></i> Faculty & Organizer Console</h1>
+          <p class="page-subtitle">Manage departmental symposiums, workshops, attendance rosters, and student certifications.</p>
+        </div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="openFacultyDetailsModal()"><i class="fas fa-user-edit"></i> Update My Details</button>
+          <button class="btn btn-outline btn-sm" onclick="exportFacultyRosterCSV()"><i class="fas fa-file-csv"></i> Export Attendees</button>
+          <a href="../create-event.html" class="btn btn-primary btn-sm"><i class="fas fa-plus-circle"></i> Create New Event</a>
+        </div>
+      </div>
+
+      <!-- Faculty Profile Details Banner -->
+      <div style="position:relative;margin-bottom:2rem;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);border:1px solid rgba(255,255,255,0.15);padding:2rem 1.8rem;color:#fff;background:linear-gradient(135deg, rgba(10,17,40,0.94) 0%, rgba(16,27,63,0.88) 50%, rgba(30,41,90,0.94) 100%), url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1600&q=80') center/cover no-repeat;">
+        <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem">
+          <div style="display:flex;align-items:center;gap:1.3rem;flex-wrap:wrap">
+            <div style="width:76px;height:76px;border-radius:20px;background:linear-gradient(135deg, #4169E1, #7957D5);color:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:900;border:3px solid rgba(255,255,255,0.25);box-shadow:0 8px 24px rgba(0,0,0,0.3)" id="facultyHeroAvatar">
+              F
+            </div>
+            <div>
+              <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap">
+                <h2 style="font-size:1.45rem;font-weight:900;color:#fff;margin:0" id="facultyHeroName">Prof. Ananya Sen</h2>
+                <span style="background:#4169E1;color:#fff;padding:0.2rem 0.65rem;border-radius:6px;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;gap:0.3rem">
+                  <i class="fas fa-chalkboard-teacher"></i> FACULTY MEMBER
+                </span>
+                <span style="color:#34D399;font-weight:700;font-size:0.82rem;display:inline-flex;align-items:center;gap:0.3rem">
+                  <i class="fas fa-check-circle"></i> Verified Academic Faculty &bull; SCSVMV University
+                </span>
+              </div>
+              <div style="display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;margin-top:0.6rem;font-size:0.88rem;color:#CBD5E1">
+                <span><i class="fas fa-id-badge" style="color:#60A5FA;margin-right:4px"></i> Designation: <strong style="color:#fff" id="facultyHeroDesig">Associate Professor</strong></span>
+                <span><i class="fas fa-university" style="color:#60A5FA;margin-right:4px"></i> Dept: <span style="color:#fff" id="facultyHeroDept">Computer Science & Engineering</span></span>
+                <span><i class="fas fa-envelope" style="color:#60A5FA;margin-right:4px"></i> <span id="facultyHeroEmail">faculty@events.edu</span></span>
+                <span><i class="fas fa-phone-alt" style="color:#60A5FA;margin-right:4px"></i> <span id="facultyHeroPhone">+91 (Not Provided)</span></span>
+                <span><i class="fas fa-door-open" style="color:#60A5FA;margin-right:4px"></i> <span id="facultyHeroOffice">Room 204, Tech Block</span></span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <button class="btn btn-secondary btn-sm" onclick="openFacultyDetailsModal()"><i class="fas fa-user-edit"></i> Edit / Add Details</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Metrics -->
+      <div class="kpi-grid" id="facultyKpiGrid">
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap primary"><i class="fas fa-calendar-check"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Hosted Events</span>
+            <span class="kpi-value" id="kpiMyEvents">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap info"><i class="fas fa-users"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Total Registrations</span>
+            <span class="kpi-value" id="kpiTotalRegs">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap success"><i class="fas fa-user-check"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Verified Attendees</span>
+            <span class="kpi-value" id="kpiAttended">0</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap warning"><i class="fas fa-hourglass-half"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">Pending Approval</span>
+            <span class="kpi-value" id="kpiPending">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Roster Section -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div>
+            <h3 class="dash-card-title"><i class="fas fa-list-alt text-secondary"></i> Departmental Events Directory</h3>
+            <p class="dash-card-subtitle">Events organized by your department and user account</p>
+          </div>
+          <div style="display:flex;gap:0.5rem">
+            <select class="form-input" id="eventStatusFilter" style="width:auto;padding:0.45rem 0.8rem;font-size:0.85rem">
+              <option value="all">All Statuses</option>
+              <option value="upcoming">Upcoming</option>
+              <option value="completed">Completed</option>
+              <option value="pending">Pending Approval</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-calendar-check"></i> Event Title</th>
+                <th><i class="fas fa-tag"></i> Category</th>
+                <th><i class="fas fa-clock"></i> Date & Time</th>
+                <th><i class="fas fa-map-marker-alt"></i> Venue</th>
+                <th><i class="fas fa-users"></i> Capacity</th>
+                <th><i class="fas fa-info-circle"></i> Status</th>
+                <th><i class="fas fa-shield-alt"></i> Approval</th>
+                <th style="text-align:right"><i class="fas fa-cog"></i> Actions</th>
+              </tr>
+            </thead>
+            <tbody id="facultyEventsTableBody">
+              <tr><td colspan="8" style="text-align:center;padding:2rem"><i class="fas fa-spinner fa-spin"></i> Loading events...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Quick Guidance & QR Desk Banner (Photographic Cards) -->
+      <div class="grid-2" style="margin-top:2rem">
+        <div style="position:relative;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid rgba(255,255,255,0.15);min-height:220px;display:flex;flex-direction:column;justify-content:flex-end;padding:1.8rem;color:#ffffff;background:url('https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80') center/cover no-repeat;">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(16,27,63,0.3) 0%, rgba(16,27,63,0.85) 60%, rgba(10,17,40,0.96) 100%);"></div>
+          <div style="position:relative;z-index:2">
+            <span class="campus-gallery-badge" style="margin-bottom:0.6rem"><i class="fas fa-qrcode"></i> Gate Operations</span>
+            <h4 style="margin-bottom:0.4rem;color:#ffffff;font-size:1.2rem;font-weight:800">Live Attendance Check-In Desk</h4>
+            <p style="font-size:0.86rem;color:#CBD5E1;margin-bottom:1.2rem;line-height:1.5">Scan student QR registration passes with any mobile camera or handheld barcode scanner at the auditorium entrance.</p>
+            <a href="attendance-scanner.html" class="btn btn-primary btn-sm"><i class="fas fa-camera"></i> Open QR Scanner Desk</a>
+          </div>
+        </div>
+
+        <div style="position:relative;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid rgba(255,255,255,0.15);min-height:220px;display:flex;flex-direction:column;justify-content:flex-end;padding:1.8rem;color:#ffffff;background:url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&q=80') center/cover no-repeat;">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(16,27,63,0.3) 0%, rgba(16,27,63,0.85) 60%, rgba(10,17,40,0.96) 100%);"></div>
+          <div style="position:relative;z-index:2">
+            <span class="campus-gallery-badge" style="margin-bottom:0.6rem;color:#C084FC"><i class="fas fa-award"></i> Verification</span>
+            <h4 style="margin-bottom:0.4rem;color:#ffffff;font-size:1.2rem;font-weight:800">Automated Certificate Issuance</h4>
+            <p style="font-size:0.86rem;color:#CBD5E1;margin-bottom:1.2rem;line-height:1.5">When student passes are marked attended, digital certificates are generated with verified cryptographic IDs.</p>
+            <a href="../verify-certificate.html" class="btn btn-outline btn-sm" style="color:#ffffff;border-color:rgba(255,255,255,0.4)"><i class="fas fa-check-circle"></i> Verification Portal</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Attendee Roster Modal -->
+  <div class="modal-overlay" id="rosterModal">
+    <div class="modal-container" style="max-width:850px">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="rosterModalTitle">Event Registration Roster</h3>
+          <p style="font-size:0.84rem;color:var(--text-muted)" id="rosterModalSubtitle">Confirmed student participants</p>
+        </div>
+        <button class="modal-close" onclick="closeRosterModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;gap:1rem;flex-wrap:wrap">
+          <input type="text" class="form-input" id="rosterSearchInput" placeholder="Filter by student name, roll number, or ticket..." style="max-width:320px;padding:0.45rem 0.8rem;font-size:0.88rem">
+          <div style="display:flex;gap:0.5rem">
+            <button class="btn btn-outline btn-sm" id="btnExportEventRoster"><i class="fas fa-download"></i> Download CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap" style="max-height:420px;overflow-y:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-ticket-alt"></i> Ticket ID</th>
+                <th><i class="fas fa-user-graduate"></i> Student Name</th>
+                <th><i class="fas fa-id-card"></i> Register No</th>
+                <th><i class="fas fa-graduation-cap"></i> Department</th>
+                <th><i class="fas fa-tag"></i> Pass Type</th>
+                <th><i class="fas fa-qrcode"></i> Attendance</th>
+              </tr>
+            </thead>
+            <tbody id="rosterTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline btn-sm" onclick="closeRosterModal()"><i class="fas fa-times"></i> Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Faculty Details Edit Modal -->
+  <div class="modal-overlay" id="facultyDetailsModal">
+    <div class="modal-card" style="max-width:540px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title"><i class="fas fa-user-edit text-primary"></i> Edit Faculty Details</h3>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin:0.25rem 0 0">Update your academic profile, designation, department, and contact info</p>
+        </div>
+        <button class="modal-close-btn" onclick="closeFacultyDetailsModal()">&times;</button>
+      </div>
+      <form id="facultyDetailsForm" onsubmit="handleSaveFacultyDetails(event)">
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem;padding:1.4rem;">
+          <div>
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-user"></i> Full Name *</label>
+            <input type="text" id="facultyEditName" class="form-input" required placeholder="e.g. Prof. Ananya Sen">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.9rem">
+            <div>
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-id-badge"></i> Designation *</label>
+              <input type="text" id="facultyEditDesig" class="form-input" required placeholder="e.g. Associate Professor">
+            </div>
+            <div>
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-phone"></i> Phone Number</label>
+              <input type="tel" id="facultyEditPhone" class="form-input" placeholder="+91 98765 43210">
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-university"></i> Academic Department *</label>
+            <select id="facultyEditDept" class="form-input" required>
+              <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Artificial Intelligence & Data Science">Artificial Intelligence & Data Science</option>
+              <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
+              <option value="Mechanical Engineering">Mechanical Engineering</option>
+              <option value="Civil Engineering">Civil Engineering</option>
+              <option value="Management Studies">Management Studies</option>
+              <option value="Science & Humanities">Science & Humanities</option>
+              <option value="University Administration">University Administration</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.9rem">
+            <div>
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-door-open"></i> Cabin / Office Location</label>
+              <input type="text" id="facultyEditOffice" class="form-input" placeholder="e.g. Room 204, Tech Block C">
+            </div>
+            <div>
+              <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-microchip"></i> Specialization</label>
+              <input type="text" id="facultyEditResearch" class="form-input" placeholder="e.g. Cloud & AI Systems">
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:0.84rem;font-weight:700;color:var(--text);margin-bottom:0.35rem"><i class="fas fa-comment-alt"></i> Faculty Note / Bio</label>
+            <textarea id="facultyEditBio" class="form-input" rows="2" placeholder="Brief note about your role, office hours, or student counseling focus..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-sm" onclick="closeFacultyDetailsModal()"><i class="fas fa-times"></i> Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Save Details</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/script.js"></script>
+  <script>
+    let currentFacultyEvents = [];
+    let currentViewingEvent = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Role enforcement: faculty or admin
+      const user = Auth.requireRole(['faculty', 'admin'], '../auth.html');
+      if (!user) return;
+
+      // Populate user info
+      renderFacultyProfile(user);
+
+      loadFacultyDashboard();
+
+      document.getElementById('eventStatusFilter').addEventListener('change', (e) => {
+        renderEventsTable(e.target.value);
+      });
+
+      document.getElementById('rosterSearchInput').addEventListener('input', (e) => {
+        filterRosterList(e.target.value.toLowerCase());
+      });
+    });
+
+    function loadFacultyDashboard() {
+      const user = Auth.getCurrentUser();
+      const allEvents = DB.getAll('events');
+      const allRegs = DB.getAll('registrations');
+
+      // Faculty sees their own events or events matching their department/organizer_id
+      currentFacultyEvents = allEvents.filter(e => {
+        if (user.role === 'admin') return true;
+        return e.organizer_id === user.id || e.organizer_name === user.name || (user.department && e.department === user.department);
+      });
+
+      // Calculate KPIs
+      const myEventIds = currentFacultyEvents.map(e => e.id);
+      const myRegs = allRegs.filter(r => myEventIds.includes(r.event_id));
+      const attendedCount = myRegs.filter(r => r.attended).length;
+      const pendingCount = currentFacultyEvents.filter(e => e.approval === 'pending').length;
+
+      document.getElementById('kpiMyEvents').textContent = currentFacultyEvents.length;
+      document.getElementById('kpiTotalRegs').textContent = myRegs.length;
+      document.getElementById('kpiAttended').textContent = attendedCount;
+      document.getElementById('kpiPending').textContent = pendingCount;
+
+      renderEventsTable('all');
+    }
+
+    function renderEventsTable(filter) {
+      const tbody = document.getElementById('facultyEventsTableBody');
+      let filtered = currentFacultyEvents;
+
+      if (filter === 'upcoming') filtered = filtered.filter(e => e.status === 'upcoming');
+      if (filter === 'completed') filtered = filtered.filter(e => e.status === 'completed');
+      if (filter === 'pending') filtered = filtered.filter(e => e.approval === 'pending');
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--text-muted)">
+          <i class="fas fa-calendar-times" style="font-size:2rem;margin-bottom:0.5rem;display:block"></i>
+          No events found for this filter. Click <strong>Create New Event</strong> to get started.
+        </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(ev => {
+        const approvalBadge = ev.approval === 'approved' 
+          ? '<span class="status-badge status-confirmed"><i class="fas fa-check-circle"></i> Approved</span>'
+          : (ev.approval === 'rejected' 
+            ? '<span class="status-badge status-danger"><i class="fas fa-times-circle"></i> Rejected</span>'
+            : '<span class="status-badge status-waitlist"><i class="fas fa-clock"></i> Pending Review</span>');
+
+        const statusBadge = ev.status === 'upcoming'
+          ? '<span class="status-badge status-upcoming"><i class="fas fa-hourglass-start"></i> Upcoming</span>'
+          : '<span class="status-badge status-completed"><i class="fas fa-check-double"></i> Completed</span>';
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700;color:var(--primary);font-size:0.95rem">${ev.title}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">ID: ${ev.id} &bull; ${ev.department || 'All Campus'}</div>
+            </td>
+            <td><span class="badge" style="background:var(--secondary-light);color:var(--secondary);font-weight:600">${ev.category}</span></td>
+            <td>
+              <div style="font-weight:600;font-size:0.86rem">${ev.date}</div>
+              <div style="font-size:0.76rem;color:var(--text-muted)">${ev.time || '09:00'} - ${ev.end_time || '17:00'}</div>
+            </td>
+            <td><div style="font-size:0.86rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${ev.venue}">${ev.venue}</div></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.85rem">
+                <strong>${ev.registered_count || 0}</strong> / ${ev.max_participants || 100}
+              </div>
+              <div class="capacity-meter" style="height:4px;margin-top:4px"><div class="capacity-fill" style="width:${Math.min(100, Math.round(((ev.registered_count || 0)/(ev.max_participants || 100))*100))}%"></div></div>
+            </td>
+            <td>${statusBadge}</td>
+            <td>${approvalBadge}</td>
+            <td style="text-align:right;white-space:nowrap">
+              <a href="attendance-scanner.html?eventId=${ev.id}" class="btn btn-outline btn-xs" title="Scan Attendees"><i class="fas fa-qrcode"></i> Scan</a>
+              <button class="btn btn-secondary btn-xs" onclick="viewEventRoster('${ev.id}')" title="View Registered Students"><i class="fas fa-users"></i> Roster</button>
+              <a href="../event-details.html?id=${ev.id}" class="btn btn-ghost btn-xs" title="View Public Page"><i class="fas fa-external-link-alt"></i></a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    let activeRosterList = [];
+
+    function viewEventRoster(eventId) {
+      const ev = DB.getById('events', eventId);
+      if (!ev) return;
+      currentViewingEvent = ev;
+
+      document.getElementById('rosterModalTitle').textContent = `Attendees: ${ev.title}`;
+      document.getElementById('rosterModalSubtitle').textContent = `Date: ${ev.date} | Venue: ${ev.venue} | Registered: ${ev.registered_count || 0}`;
+
+      const allRegs = DB.getAll('registrations');
+      activeRosterList = allRegs.filter(r => r.event_id === eventId);
+
+      renderRosterRows(activeRosterList);
+
+      document.getElementById('btnExportEventRoster').onclick = () => {
+        DB.downloadCSV(`${ev.id}_roster`, activeRosterList);
+      };
+
+      document.getElementById('rosterModal').classList.add('active');
+    }
+
+    function renderRosterRows(list) {
+      const tbody = document.getElementById('rosterTableBody');
+      if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">No students registered yet for this event.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(r => `
+        <tr>
+          <td><code style="font-weight:700;color:var(--secondary)">${r.ticket_id}</code></td>
+          <td><strong>${r.student_name || r.name || 'Anonymous Student'}</strong></td>
+          <td>${r.register_number || r.roll_no || 'N/A'}</td>
+          <td>${r.department || 'Engineering'}</td>
+          <td><span class="badge ${r.status === 'waitlist' ? 'status-waitlist' : 'status-confirmed'}">${r.status.toUpperCase()}</span></td>
+          <td>
+            ${r.attended 
+              ? `<span class="badge status-confirmed"><i class="fas fa-check"></i> Checked-in</span>` 
+              : `<span class="badge" style="background:#e5e7eb;color:#4b5563"><i class="fas fa-clock"></i> Pending</span>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterRosterList(term) {
+      const filtered = activeRosterList.filter(r => 
+        (r.student_name && r.student_name.toLowerCase().includes(term)) ||
+        (r.ticket_id && r.ticket_id.toLowerCase().includes(term)) ||
+        (r.register_number && r.register_number.toLowerCase().includes(term))
+      );
+      renderRosterRows(filtered);
+    }
+
+    function closeRosterModal() {
+      document.getElementById('rosterModal').classList.remove('active');
+    }
+
+    function exportFacultyRosterCSV() {
+      const myEventIds = currentFacultyEvents.map(e => e.id);
+      const allRegs = DB.getAll('registrations');
+      const facultyAttendees = allRegs.filter(r => myEventIds.includes(r.event_id));
+      DB.downloadCSV('faculty_all_attendees', facultyAttendees);
+    }
+
+    function renderFacultyProfile(user) {
+      if (!user) user = Auth.getCurrentUser() || {};
+      const name = user.name || 'Faculty Organizer';
+      const desig = user.designation || 'Associate Professor';
+      const dept = user.department || 'Computer Science & Engineering';
+      const email = user.email || 'faculty@events.edu';
+      const phone = user.phone || '+91 98765 43210';
+      const office = user.office || user.cabin || 'Room 204, Tech Block C';
+      const initial = name.charAt(0).toUpperCase();
+
+      document.getElementById('facultyName').textContent = name;
+      document.getElementById('facultyDept').textContent = dept;
+      document.getElementById('facultyAvatar').textContent = initial;
+
+      document.getElementById('facultyHeroName').textContent = name;
+      document.getElementById('facultyHeroDesig').textContent = desig;
+      document.getElementById('facultyHeroDept').textContent = dept;
+      document.getElementById('facultyHeroEmail').textContent = email;
+      document.getElementById('facultyHeroPhone').textContent = phone;
+      document.getElementById('facultyHeroOffice').textContent = office;
+      document.getElementById('facultyHeroAvatar').textContent = initial;
+    }
+
+    function openFacultyDetailsModal() {
+      const user = Auth.getCurrentUser() || {};
+      document.getElementById('facultyEditName').value = user.name || '';
+      document.getElementById('facultyEditDesig').value = user.designation || 'Associate Professor';
+      document.getElementById('facultyEditDept').value = user.department || 'Computer Science & Engineering';
+      document.getElementById('facultyEditPhone').value = user.phone || '';
+      document.getElementById('facultyEditOffice').value = user.office || user.cabin || '';
+      document.getElementById('facultyEditResearch').value = user.specialization || user.research || '';
+      document.getElementById('facultyEditBio').value = user.bio || '';
+
+      const modal = document.getElementById('facultyDetailsModal');
+      modal.classList.add('open');
+    }
+
+    function closeFacultyDetailsModal() {
+      document.getElementById('facultyDetailsModal').classList.remove('open');
+    }
+
+    async function handleSaveFacultyDetails(e) {
+      e.preventDefault();
+      const updatedData = {
+        name: document.getElementById('facultyEditName').value.trim(),
+        designation: document.getElementById('facultyEditDesig').value.trim(),
+        department: document.getElementById('facultyEditDept').value.trim(),
+        phone: document.getElementById('facultyEditPhone').value.trim(),
+        office: document.getElementById('facultyEditOffice').value.trim(),
+        cabin: document.getElementById('facultyEditOffice').value.trim(),
+        specialization: document.getElementById('facultyEditResearch').value.trim(),
+        bio: document.getElementById('facultyEditBio').value.trim()
+      };
+
+      const res = await Auth.updateProfile(updatedData);
+      if (res && res.ok) {
+        renderFacultyProfile(res.session);
+        closeFacultyDetailsModal();
+        if (window.Toast) Toast.show('Faculty details updated successfully!', 'success');
+        else alert('Details updated successfully!');
+      } else {
+        alert(res.msg || 'Failed to update details.');
+      }
+    }
+  </script>
+</body>
+</html>
