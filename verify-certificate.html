@@ -302,11 +302,33 @@
       `;
       if (window.Icons) window.Icons.render(display);
 
-      setTimeout(() => {
-        const allCerts = (window.DB ? window.DB.getAll('certificates') : []);
-        let cert = allCerts.find(c => c.certificate_id.toLowerCase() === certId.toLowerCase());
+      (async () => {
+        let cert = null;
 
-        // Check if matching registration attended
+        // 1. Query Render backend API
+        try {
+          const apiBase = (window.CampusConfig && window.CampusConfig.get('apiBase'))
+            || window.API_BASE_URL
+            || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? 'http://localhost:3000/api'
+                : 'https://events-i8r7.onrender.com/api');
+
+          const resp = await fetch(`${apiBase}/certificates/verify/${encodeURIComponent(certId)}`);
+          if (resp && resp.ok) {
+            const data = await resp.json();
+            if (data && data.ok && data.certificate) {
+              cert = data.certificate;
+            }
+          }
+        } catch (e) {}
+
+        // 2. Query Local Database fallback
+        if (!cert) {
+          const allCerts = (window.DB ? window.DB.getAll('certificates') : []);
+          cert = allCerts.find(c => c.certificate_id.toLowerCase() === certId.toLowerCase());
+        }
+
+        // 3. Check if matching registration attended
         if (!cert && window.DB) {
           const allRegs = window.DB.getAll('registrations') || [];
           const reg = allRegs.find(r => 
@@ -335,7 +357,7 @@
         } else {
           renderErrorResult(certId);
         }
-      }, 350);
+      })();
     }
 
     function renderVerifiedResult(cert) {

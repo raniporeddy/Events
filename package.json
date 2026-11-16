@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "build": "echo 'Static production assets ready'",
     "dev": "node server.js",
     "test": "echo \"No test specified\" && exit 0"
   },

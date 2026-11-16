@@ -17,8 +17,28 @@ const CampusConfig = (() => {
     address: 'Enathur, Kanchipuram, Tamil Nadu 631561',
     logoUrl: 'assets/images/logo.png',
 
-    // API Base URL
-    apiBase: window.location.origin.includes('http') ? window.location.origin + '/api' : 'http://localhost:3000/api',
+    // Centralized Production & Development API Base URL
+    // Automatically uses http://localhost:3000/api on localhost/127.0.0.1,
+    // and Render backend https://events-i8r7.onrender.com/api when deployed in production (e.g. Vercel)
+    apiBase: (() => {
+      try {
+        const hostname = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
+        const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
+        return isLocal ? 'http://localhost:3000/api' : 'https://events-i8r7.onrender.com/api';
+      } catch (e) {
+        return 'https://events-i8r7.onrender.com/api';
+      }
+    })(),
+
+    backendOrigin: (() => {
+      try {
+        const hostname = (typeof window !== 'undefined' && window.location && window.location.hostname) || '';
+        const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
+        return isLocal ? 'http://localhost:3000' : 'https://events-i8r7.onrender.com';
+      } catch (e) {
+        return 'https://events-i8r7.onrender.com';
+      }
+    })(),
 
     // User Roles
     roles: {
@@ -178,9 +198,13 @@ const CampusConfig = (() => {
 
 // Attach to global window
 window.CampusConfig = CampusConfig;
+window.API_BASE_URL = CampusConfig.get('apiBase');
+window.BACKEND_ORIGIN = CampusConfig.get('backendOrigin');
 window.CONFIG = {
   BRANDING: CampusConfig.BRANDING,
   EVENT_CATEGORIES: CampusConfig.EVENT_CATEGORIES,
   DEPARTMENTS: CampusConfig.DEPARTMENTS,
-  THEME: CampusConfig.get('theme')
+  THEME: CampusConfig.get('theme'),
+  API_BASE_URL: CampusConfig.get('apiBase'),
+  BACKEND_ORIGIN: CampusConfig.get('backendOrigin')
 };

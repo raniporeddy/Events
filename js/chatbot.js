@@ -224,8 +224,14 @@ const EventsChatbot = (() => {
 
     // 1. Try backend AI endpoint if reachable
     let answered = false;
+    const apiBase = (window.CampusConfig && typeof window.CampusConfig.get === 'function' && window.CampusConfig.get('apiBase'))
+      || window.API_BASE_URL
+      || ((window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+          ? 'http://localhost:3000/api'
+          : 'https://events-i8r7.onrender.com/api');
+
     try {
-      const resp = await fetch('/api/ai/chat', {
+      const resp = await fetch(`${apiBase}/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })

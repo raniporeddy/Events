@@ -6,7 +6,7 @@
   <title>Attendance Desk | EVENTS</title>
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/dashboard.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous"">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous">
   <script src="../js/icons.js"></script>
   <!-- HTML5-QRCode Scanner Library -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -348,6 +348,21 @@
 
       // Check attendance in DB
       const result = DB.markAttendanceByTicket(ticketId, scannedByName);
+
+      // Asynchronously sync attendance to backend API
+      try {
+        const apiBase = (window.CampusConfig && window.CampusConfig.get('apiBase'))
+          || window.API_BASE_URL
+          || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+              ? 'http://localhost:3000/api'
+              : 'https://events-i8r7.onrender.com/api');
+
+        fetch(`${apiBase}/attendance/scan`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticket_id: ticketId, scanned_by: scannedByName })
+        }).catch(() => {});
+      } catch (err) {}
       const resultCard = document.getElementById('resultCard');
       const resultContent = document.getElementById('resultContent');
 

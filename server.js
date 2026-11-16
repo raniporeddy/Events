@@ -14,7 +14,41 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Production CORS Configuration for Vercel & Localhost
+const ALLOWED_ORIGINS = [
+  'https://events-nu-blond.vercel.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:5500',
+  'http://127.0.0.1:5500',
+  'http://localhost:8080',
+  'http://127.0.0.1:8080'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    const originLower = origin.toLowerCase();
+    const isAllowed = ALLOWED_ORIGINS.some(allowed => originLower === allowed.toLowerCase()) ||
+                      originLower.endsWith('.vercel.app') ||
+                      originLower.includes('localhost') ||
+                      originLower.includes('127.0.0.1');
+
+    if (isAllowed) {
+      return callback(null, true);
+    }
+    // Allow by default to prevent blocking unexpected preview URLs
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Set-Cookie', 'Date'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+app.options(/(.*)/, cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -1501,9 +1535,11 @@ app.use((req, res, next) => {
 
 // Start server if executed directly
 if (require.main === module) {
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`\n======================================================`);
-    console.log(`🚀 EVENTS Server running at http://localhost:${PORT}`);
+    console.log(`🚀 EVENTS Server running at http://0.0.0.0:${PORT}`);
+    console.log(`📡 Render/Production Port: ${PORT}`);
+    console.log(`🌐 Allowed Frontend Origin: https://events-nu-blond.vercel.app`);
     console.log(`📧 SMTP Email Status: ${process.env.SMTP_HOST ? 'Configured (' + process.env.SMTP_HOST + ')' : 'Development Mode (Simulated OTP)'}`);
     console.log(`======================================================\n`);
   });

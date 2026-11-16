@@ -11,11 +11,22 @@ const Auth = (() => {
     otp: 'campusconnect_pending_otp',
   };
 
-  const API_ENDPOINT = (window.CampusConfig && window.CampusConfig.get && window.CampusConfig.get('apiBase'))
-    ? window.CampusConfig.get('apiBase')
-    : ((window.location && typeof window.location.origin === 'string' && window.location.origin.includes('http'))
-      ? window.location.origin + '/api'
-      : 'http://localhost:3000/api');
+  const API_ENDPOINT = (() => {
+    try {
+      if (window.CampusConfig && typeof window.CampusConfig.get === 'function') {
+        const base = window.CampusConfig.get('apiBase');
+        if (base) return base;
+      }
+      if (typeof window.API_BASE_URL === 'string' && window.API_BASE_URL) {
+        return window.API_BASE_URL;
+      }
+      const hostname = (window.location && window.location.hostname) || '';
+      const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
+      return isLocal ? 'http://localhost:3000/api' : 'https://events-i8r7.onrender.com/api';
+    } catch {
+      return 'https://events-i8r7.onrender.com/api';
+    }
+  })();
 
   /* ───────── HASH HELPER ───────── */
   async function _hashPassword(str) {
