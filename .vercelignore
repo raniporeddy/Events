@@ -1,0 +1,12 @@
+# Ignore backend server and Node files on Vercel
+# This forces Vercel to deploy as a 100% pure static site on Vercel Edge CDN
+server.js
+package.json
+package-lock.json
+node_modules/
+data/
+scratch/
+.env
+.env.*
+.git
+.gitignore
